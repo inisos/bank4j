@@ -45,19 +45,19 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
         <!-- Dependency versions -->
-        <iban4j.version>3.2.2-RELEASE</iban4j.version>
+        <iban4j.version>3.2.3-RELEASE</iban4j.version>
         <jakarta-validation-api.version>2.0.2</jakarta-validation-api.version>
         <jakarta-xml-bind-api.version>2.3.3</jakarta-xml-bind-api.version>
-        <jaxb-impl.version>2.3.3</jaxb-impl.version>
+        <jaxb-runtime.version>2.3.6</jaxb-runtime.version>
 
         <!-- Test Dependency versions -->
-        <hibernate-validator.version>6.1.7.Final</hibernate-validator.version>
-        <jakarta-el.version>3.0.3</jakarta-el.version>
-        <junit.version>5.7.0</junit.version>
+        <hibernate-validator.version>6.2.3.Final</hibernate-validator.version>
+        <jakarta-el.version>3.0.4</jakarta-el.version>
+        <junit.version>5.8.2</junit.version>
 
         <!-- Plugin versions -->
         <jaxb2-maven-plugin.version>2.5.0</jaxb2-maven-plugin.version>
-        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
@@ -82,9 +82,9 @@
             <version>${jakarta-xml-bind-api.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>${jaxb-impl.version}</version>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>${jaxb-runtime.version}</version>
             <scope>runtime</scope>
         </dependency>
 
