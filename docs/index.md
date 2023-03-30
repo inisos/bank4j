@@ -42,7 +42,7 @@ Simply provide bank account details and transactions:
 ```java
 class MyApp {
 
-    public static void main() {
+    public static void main(String...args) {
 
         // debtor
         BankAccount debtor = new SimpleBankAccount(
