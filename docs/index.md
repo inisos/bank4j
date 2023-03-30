@@ -13,7 +13,7 @@ Written in Java 8 using JAXB and [iban4j](https://github.com/arturmkrtchyan/iban
 <dependency>
     <groupId>io.inisos.bank4j</groupId>
     <artifactId>bank4j</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.1</version>
 </dependency>
 ```
 
