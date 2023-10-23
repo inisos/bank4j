@@ -78,7 +78,9 @@ class MyApp {
         // transfer
         CreditTransfer creditTransfer = Bank.creditTransferSepa(
                 debtor,
-                transactions);
+                transactions,
+                LocalDate.now().plusDays(2) // optional requested execution date, defaults to tomorrow
+        );
 
         // export to string
         String formattedOutput = creditTransfer.marshal(true); // true: enables formatting
@@ -115,6 +117,7 @@ Output with formatting:
                     <Cd>SEPA</Cd>
                 </SvcLvl>
             </PmtTpInf>
+            <ReqdExctnDt>2021-01-05</ReqdExctnDt>
             <Dbtr>
                 <Nm>Debtor Account Name</Nm>
             </Dbtr>

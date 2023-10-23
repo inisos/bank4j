@@ -15,6 +15,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.namespace.QName;
 import java.io.Writer;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
@@ -35,7 +36,8 @@ public class JAXBCreditTransfer implements CreditTransfer {
     private final BankAccount debtor;
     private final Collection<Transaction> transactions;
     private final String id;
-    private final LocalDateTime executionDate;
+    private final LocalDateTime creationDateTime;
+    private final LocalDate requestedExecutionDate;
 
     private final DatatypeFactory datatypeFactory;
 
@@ -48,14 +50,31 @@ public class JAXBCreditTransfer implements CreditTransfer {
      * @param debtor           debtor account
      * @param transactions     transactions (cannot contain duplicates)
      * @param id               optional identifier, defaults to execution date and time
-     * @param dateTime         optional execution date and time, defaults to now
+     * @param creationDateTime optional execution date and time, defaults to now
+     * @deprecated use full constructor
      */
-    public JAXBCreditTransfer(String serviceLevelCode, BankAccount debtor, Collection<Transaction> transactions, String id, LocalDateTime dateTime) {
+    @Deprecated
+    public JAXBCreditTransfer(String serviceLevelCode, BankAccount debtor, Collection<Transaction> transactions, String id, LocalDateTime creationDateTime) {
+        this(serviceLevelCode, debtor, transactions, id, creationDateTime, null);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param serviceLevelCode       eg. "SEPA"
+     * @param debtor                 debtor account
+     * @param transactions           transactions (cannot contain duplicates)
+     * @param id                     optional identifier, defaults to execution date and time
+     * @param creationDateTime       optional message creation date and time, defaults to now
+     * @param requestedExecutionDate optional requested execution date and time, defaults to tomorrow
+     */
+    public JAXBCreditTransfer(String serviceLevelCode, BankAccount debtor, Collection<Transaction> transactions, String id, LocalDateTime creationDateTime, LocalDate requestedExecutionDate) {
         this.serviceLevelCode = Objects.requireNonNull(serviceLevelCode);
         this.debtor = Objects.requireNonNull(debtor);
         this.transactions = Objects.requireNonNull(transactions);
-        this.executionDate = Optional.ofNullable(dateTime).orElse(LocalDateTime.now());
-        this.id = Optional.ofNullable(id).orElseGet(() -> FORMAT_AS_ID.format(executionDate));
+        this.creationDateTime = Optional.ofNullable(creationDateTime).orElse(LocalDateTime.now());
+        this.requestedExecutionDate = Optional.ofNullable(requestedExecutionDate).orElse(LocalDate.now().plusDays(1));
+        this.id = Optional.ofNullable(id).orElseGet(() -> FORMAT_AS_ID.format(this.creationDateTime));
 
         try {
             this.datatypeFactory = DatatypeFactory.newInstance();
@@ -119,6 +138,8 @@ public class JAXBCreditTransfer implements CreditTransfer {
         paymentTypeInformation.setSvcLvl(serviceLevel);
         paymentInstructionInformationSCT3.setPmtTpInf(paymentTypeInformation);
 
+        paymentInstructionInformationSCT3.setReqdExctnDt(this.datatypeFactory.newXMLGregorianCalendar(DateTimeFormatter.ISO_LOCAL_DATE.format(requestedExecutionDate)));
+
         paymentInstructionInformationSCT3.setChrgBr(ChargeBearerType1Code.SLEV);
 
         for (Transaction transaction : this.transactions) {
@@ -133,7 +154,7 @@ public class JAXBCreditTransfer implements CreditTransfer {
     private GroupHeader32 header() {
         GroupHeader32 head = new GroupHeader32();
         head.setMsgId(id);
-        head.setCreDtTm(this.datatypeFactory.newXMLGregorianCalendar(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(executionDate)));
+        head.setCreDtTm(this.datatypeFactory.newXMLGregorianCalendar(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(creationDateTime)));
         head.setNbOfTxs(String.valueOf(this.transactions.size()));
         head.setCtrlSum(this.getTotalAmount());
         head.setInitgPty(partyIdentification(this.debtor));
@@ -209,8 +230,13 @@ public class JAXBCreditTransfer implements CreditTransfer {
     }
 
     @Override
-    public LocalDateTime getExecutionDate() {
-        return executionDate;
+    public LocalDateTime getCreationDateTime() {
+        return creationDateTime;
+    }
+
+    @Override
+    public LocalDate getRequestedExecutionDate() {
+        return requestedExecutionDate;
     }
 
     @Override
@@ -223,12 +249,12 @@ public class JAXBCreditTransfer implements CreditTransfer {
         if (this == o) return true;
         if (!(o instanceof JAXBCreditTransfer)) return false;
         JAXBCreditTransfer that = (JAXBCreditTransfer) o;
-        return serviceLevelCode.equals(that.serviceLevelCode) && debtor.equals(that.debtor) && getTransactions().equals(that.getTransactions()) && id.equals(that.id) && executionDate.equals(that.executionDate);
+        return serviceLevelCode.equals(that.serviceLevelCode) && debtor.equals(that.debtor) && getTransactions().equals(that.getTransactions()) && id.equals(that.id) && creationDateTime.equals(that.creationDateTime) && requestedExecutionDate.equals(that.requestedExecutionDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(serviceLevelCode, debtor, getTransactions(), id, executionDate);
+        return Objects.hash(serviceLevelCode, debtor, getTransactions(), id, creationDateTime, requestedExecutionDate);
     }
 
     @Override
@@ -237,7 +263,8 @@ public class JAXBCreditTransfer implements CreditTransfer {
                 .add("serviceLevelCode='" + serviceLevelCode + "'")
                 .add("debtor=" + debtor)
                 .add("id='" + id + "'")
-                .add("executionDate=" + executionDate)
+                .add("creationDateTime=" + creationDateTime)
+                .add("requestedExecutionDate=" + requestedExecutionDate)
                 .toString();
     }
 }
