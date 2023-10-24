@@ -17,7 +17,7 @@ Tested with [Qonto](https://qonto.com) bulk SEPA transfers.
 <dependency>
     <groupId>io.inisos.bank4j</groupId>
     <artifactId>bank4j</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 
