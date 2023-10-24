@@ -1,7 +1,7 @@
 package io.inisos.bank4j.validator.constraintvalidators;
 
 import io.inisos.bank4j.BankAccount;
-import io.inisos.bank4j.impl.SimpleBankAccount;
+import io.inisos.bank4j.impl.SimpleBankAccountBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ class BICValidatorTest {
     @Test
     void isValid_pass_with_valid_BIC8() {
 
-        BankAccount invalidBankAccount = new SimpleBankAccount("Banque de France", "FR7630001007941234567890185", "BDFEFRPP");
+        BankAccount invalidBankAccount = new SimpleBankAccountBuilder().iban("FR7630001007941234567890185").bic("BDFEFRPP").build();
 
         Set<ConstraintViolation<BankAccount>> constraintViolations =
                 validator.validate(invalidBankAccount);
@@ -37,7 +37,7 @@ class BICValidatorTest {
     @Test
     void isValid_pass_with_valid_BIC11() {
 
-        BankAccount invalidBankAccount = new SimpleBankAccount("Banque de France", "FR7630001007941234567890185", "BDFEFRPPXXX");
+        BankAccount invalidBankAccount = new SimpleBankAccountBuilder().iban("FR7630001007941234567890185").bic("BDFEFRPPXXX").build();
 
         Set<ConstraintViolation<BankAccount>> constraintViolations =
                 validator.validate(invalidBankAccount);
@@ -48,7 +48,7 @@ class BICValidatorTest {
     @Test
     void isValid_fail_with_invalid_BIC() {
 
-        BankAccount invalidBankAccount = new SimpleBankAccount("Name", "FR7630001007941234567890185", "x");
+        BankAccount invalidBankAccount = new SimpleBankAccountBuilder().iban("FR7630001007941234567890185").bic("x").build();
 
         Set<ConstraintViolation<BankAccount>> constraintViolations =
                 validator.validate(invalidBankAccount);

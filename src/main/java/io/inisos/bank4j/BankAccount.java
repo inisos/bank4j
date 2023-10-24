@@ -1,14 +1,11 @@
 package io.inisos.bank4j;
 
+import java.util.Optional;
+
 /**
  * Bank Account
  */
 public interface BankAccount {
-
-    /**
-     * @return name
-     */
-    String getName();
 
     /**
      * @return IBAN
@@ -18,5 +15,10 @@ public interface BankAccount {
     /**
      * @return BIC, can be null
      */
-    String getBic();
+    Optional<String> getBic();
+
+    /**
+     * @return name
+     */
+    Optional<String> getName();
 }

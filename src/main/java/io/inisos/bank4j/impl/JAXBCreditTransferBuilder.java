@@ -1,9 +1,6 @@
 package io.inisos.bank4j.impl;
 
-import io.inisos.bank4j.BankAccount;
-import io.inisos.bank4j.CreditTransferOperation;
-import io.inisos.bank4j.CreditTransferOperationBuilder;
-import io.inisos.bank4j.Transaction;
+import io.inisos.bank4j.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,7 +9,8 @@ import java.util.Collection;
 
 public class JAXBCreditTransferBuilder implements CreditTransferOperationBuilder {
     private String serviceLevelCode;
-    private BankAccount debtor;
+    private Party debtor;
+    private BankAccount debtorAccount;
     private final Collection<Transaction> transactions = new ArrayList<>();
     private String id;
     private LocalDateTime creationDateTime;
@@ -25,8 +23,14 @@ public class JAXBCreditTransferBuilder implements CreditTransferOperationBuilder
     }
 
     @Override
-    public CreditTransferOperationBuilder debtor(BankAccount debtor) {
+    public CreditTransferOperationBuilder debtor(Party debtor) {
         this.debtor = debtor;
+        return this;
+    }
+
+    @Override
+    public CreditTransferOperationBuilder debtorAccount(BankAccount debtorAccount) {
+        this.debtorAccount = debtorAccount;
         return this;
     }
 
@@ -62,6 +66,6 @@ public class JAXBCreditTransferBuilder implements CreditTransferOperationBuilder
 
     @Override
     public CreditTransferOperation build() {
-        return new JAXBCreditTransfer(serviceLevelCode, debtor, transactions, id, creationDateTime, requestedExecutionDate);
+        return new JAXBCreditTransfer(serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate);
     }
 }

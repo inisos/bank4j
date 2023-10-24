@@ -1,21 +1,29 @@
 package io.inisos.bank4j.impl;
 
 import io.inisos.bank4j.BankAccount;
+import io.inisos.bank4j.Party;
 import io.inisos.bank4j.TransactionBuilder;
 
 import java.math.BigDecimal;
 import java.util.Currency;
 
 public class SimpleTransactionBuilder implements TransactionBuilder {
-    private BankAccount thirdParty;
+    private Party party;
+    private BankAccount account;
     private BigDecimal amount;
     private Currency currency;
     private String endToEndId;
     private String id;
 
     @Override
-    public SimpleTransactionBuilder thirdParty(BankAccount thirdParty) {
-        this.thirdParty = thirdParty;
+    public SimpleTransactionBuilder party(Party party) {
+        this.party = party;
+        return this;
+    }
+
+    @Override
+    public SimpleTransactionBuilder account(BankAccount account) {
+        this.account = account;
         return this;
     }
 
@@ -45,6 +53,6 @@ public class SimpleTransactionBuilder implements TransactionBuilder {
 
     @Override
     public SimpleTransaction build() {
-        return new SimpleTransaction(thirdParty, amount, currency, endToEndId, id);
+        return new SimpleTransaction(party, account, amount, currency, endToEndId, id);
     }
 }

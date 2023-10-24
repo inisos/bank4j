@@ -1,6 +1,7 @@
 package io.inisos.bank4j;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 /**
  * Transaction
@@ -8,9 +9,14 @@ import java.math.BigDecimal;
 public interface Transaction {
 
     /**
-     * @return third party bank account
+     * @return third party identification
      */
-    BankAccount getThirdParty();
+    Optional<Party> getParty();
+
+    /**
+     * @return cash account
+     */
+    BankAccount getAccount();
 
     /**
      * @return transaction amount
@@ -28,7 +34,7 @@ public interface Transaction {
     String getEndToEndId();
 
     /**
-     * @return optional identifier (can be null)
+     * @return optional identifier
      */
-    String getId();
+    Optional<String> getId();
 }

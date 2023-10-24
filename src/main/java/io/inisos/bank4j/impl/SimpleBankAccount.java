@@ -6,6 +6,7 @@ import io.inisos.bank4j.validator.constraints.IBAN;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.StringJoiner;
 
 /**
@@ -15,34 +16,19 @@ import java.util.StringJoiner;
  */
 public class SimpleBankAccount implements BankAccount {
 
-    @NotBlank
-    private String name;
-
     @IBAN
     @NotBlank
-    private String iban;
+    private final String iban;
 
     @BIC
-    private String bic;
+    private final String bic;
 
-    public SimpleBankAccount(String name, String iban) {
-        this(name, iban, null);
-    }
+    private final String name;
 
-    public SimpleBankAccount(String name, String iban, String bic) {
-        this.name = name;
-        this.iban = iban;
+    public SimpleBankAccount(String iban, String bic, String name) {
+        this.iban = Objects.requireNonNull(iban, "IBAN is required");
         this.bic = bic;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public SimpleBankAccount setName(String name) {
         this.name = name;
-        return this;
     }
 
     @Override
@@ -50,19 +36,14 @@ public class SimpleBankAccount implements BankAccount {
         return iban;
     }
 
-    public SimpleBankAccount setIban(String iban) {
-        this.iban = iban;
-        return this;
+    @Override
+    public Optional<String> getBic() {
+        return Optional.ofNullable(bic);
     }
 
     @Override
-    public String getBic() {
-        return bic;
-    }
-
-    public SimpleBankAccount setBic(String bic) {
-        this.bic = bic;
-        return this;
+    public Optional<String> getName() {
+        return Optional.ofNullable(name);
     }
 
     @Override
@@ -70,17 +51,19 @@ public class SimpleBankAccount implements BankAccount {
         if (this == o) return true;
         if (!(o instanceof SimpleBankAccount)) return false;
         SimpleBankAccount that = (SimpleBankAccount) o;
-        return getName().equals(that.getName()) && getIban().equals(that.getIban()) && Objects.equals(getBic(), that.getBic());
+        return Objects.equals(iban, that.iban);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getIban(), getBic());
+        return Objects.hash(iban);
     }
 
     @Override
     public String toString() {
         return new StringJoiner(", ", SimpleBankAccount.class.getSimpleName() + "[", "]")
+                .add("iban='" + iban + "'")
+                .add("bic='" + bic + "'")
                 .add("name='" + name + "'")
                 .toString();
     }

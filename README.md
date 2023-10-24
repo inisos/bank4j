@@ -44,46 +44,66 @@ Only accepts valid IBAN, BIC8 and BIC11.
 Simply provide bank account details and transactions:
 
 ```java
+import io.inisos.bank4j.Bank;
+
 class MyApp {
 
-    public static void main(String...args) {
+    public static void main(String... args) {
 
-        // debtor
-        BankAccount debtor = new SimpleBankAccount(
-                "Debtor Account Name",         // Name
-                "FR7610011000201234567890188", // IBAN
-                "PSSTFRPP"                     // BIC (optional)
-        );
-        // creditor
-        BankAccount creditor = new SimpleBankAccount(
-                "Beneficiary Account Name",    // Name
-                "FR7630001007941234567890185", // IBAN
-                "BDFEFRPP"                     // BIC (optional)
-        );
-        // transactions
+        // Optional debtor identification
+        Party debtor = Bank.simpleParty()
+                .name("Debtor Name") // Optional name
+                .build();
+
+        // Debtor account
+        BankAccount debtorAccount = Bank.simpleBankAccount()
+                .iban("FR7610011000201234567890188") // IBAN
+                .bic("PSSTFRPP")                     // Optional BIC
+                .build();
+
+        // Optional creditor identification
+        Party creditor = Bank.simpleParty()
+                .name("Creditor Name")                    // Optional name
+                .postalAddress(Bank.simplePostalAddress() // Optional postal address
+                        .addressLine("1, rue de La Vrillière")
+                        .addressLine("75001 PARIS")
+                        .country("FR")
+                        .build())
+                .build();
+
+        // Creditor account
+        BankAccount creditorAccount = Bank.simpleBankAccount()
+                .iban("FR7630001007941234567890185") // IBAN
+                .bic("BDFEFRPP")                     // Optional BIC
+                .build();
+
+        // Transactions
         Transaction transaction1 = Bank.simpleTransaction()
-                .thirdParty(creditor)               // Beneficiary bank account
+                .party(creditor)                    // Optional creditor identification
+                .account(creditorAccount)           // Creditor account
                 .amount("12.34")                    // Amount, converted to BigDecimal
                 .currency("EUR")                    // Currency code
                 .endToEndId("Transfer reference 1") // End to end identifier
-                .id("Optional identifier 1")        // Transaction identifier (optional)
+                .id("Optional identifier 1")        // Optional Transaction identifier
                 .build();
         Transaction transaction2 = Bank.simpleTransaction()
-                .thirdParty(creditor)               // Beneficiary bank account
+                .party(creditor)                    // Optional creditor identification
+                .account(creditorAccount)           // Creditor account
                 .amount(new BigDecimal("56.78"))    // Amount as BigDecimal
                 .currency("EUR")                    // Currency code
                 .endToEndId("Transfer reference 2") // End to end identifier
-                .id("Optional identifier 2")        // Transaction identifier (optional)
+                .id("Optional identifier 2")        // Optional transaction identifier
                 .build();
 
-        // transfer
+        // Transfer
         CreditTransferOperation creditTransfer = Bank.jaxbCreditTransferSepa()
-                .debtor(debtor)                                      // mandatory debtor
-                .transaction(transaction1)                           // at least 1 transaction
-                .transaction(transaction2)                           // optional additional transaction
-                .creationDateTime(LocalDateTime.now())               // optional message creation date and time, defaults to now
-                .requestedExecutionDate(LocalDate.now().plusDays(1)) // optional requested execution date, defaults to tomorrow
-                .id("MYID")                                          // optional identifier, defaults to reation date and time as yyyyMMddhhmmss
+                .debtor(debtor)                                      // Optional debtor
+                .debtorAccount(debtorAccount)                        // Mandatory debtor account
+                .transaction(transaction1)                           // At least 1 transaction
+                .transaction(transaction2)                           // Optional additional transaction
+                .creationDateTime(LocalDateTime.now())               // Optional message creation date and time, defaults to now
+                .requestedExecutionDate(LocalDate.now().plusDays(1)) // Optional requested execution date, defaults to tomorrow
+                .id("MYID")                                          // Optional identifier, defaults to creation date and time as yyyyMMddhhmmss
                 .build();
 
         // export to string
@@ -102,12 +122,12 @@ Output with formatting:
 <Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03">
     <CstmrCdtTrfInitn>
         <GrpHdr>
-            <MsgId>20210104054241</MsgId>
-            <CreDtTm>2021-01-04T05:42:41.7338511</CreDtTm>
+            <MsgId>MYID</MsgId>
+            <CreDtTm>2023-10-24T16:27:53.594</CreDtTm>
             <NbOfTxs>2</NbOfTxs>
             <CtrlSum>69.12</CtrlSum>
             <InitgPty>
-                <Nm>Debtor Account Name</Nm>
+                <Nm>Debtor Name</Nm>
             </InitgPty>
         </GrpHdr>
         <PmtInf>
@@ -121,9 +141,9 @@ Output with formatting:
                     <Cd>SEPA</Cd>
                 </SvcLvl>
             </PmtTpInf>
-            <ReqdExctnDt>2021-01-05</ReqdExctnDt>
+            <ReqdExctnDt>2023-10-25</ReqdExctnDt>
             <Dbtr>
-                <Nm>Debtor Account Name</Nm>
+                <Nm>Debtor Name</Nm>
             </Dbtr>
             <DbtrAcct>
                 <Id>
@@ -150,7 +170,12 @@ Output with formatting:
                     </FinInstnId>
                 </CdtrAgt>
                 <Cdtr>
-                    <Nm>Beneficiary Account Name</Nm>
+                    <Nm>Creditor Name</Nm>
+                    <PstlAdr>
+                        <Ctry>FR</Ctry>
+                        <AdrLine>1, rue de La Vrillière</AdrLine>
+                        <AdrLine>75001 PARIS</AdrLine>
+                    </PstlAdr>
                 </Cdtr>
                 <CdtrAcct>
                     <Id>
@@ -172,7 +197,12 @@ Output with formatting:
                     </FinInstnId>
                 </CdtrAgt>
                 <Cdtr>
-                    <Nm>Beneficiary Account Name</Nm>
+                    <Nm>Creditor Name</Nm>
+                    <PstlAdr>
+                        <Ctry>FR</Ctry>
+                        <AdrLine>1, rue de La Vrillière</AdrLine>
+                        <AdrLine>75001 PARIS</AdrLine>
+                    </PstlAdr>
                 </Cdtr>
                 <CdtrAcct>
                     <Id>

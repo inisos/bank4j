@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.util.Currency;
 
 public interface TransactionBuilder {
-    TransactionBuilder thirdParty(BankAccount thirdParty);
+
+    TransactionBuilder party(Party party);
+
+    TransactionBuilder account(BankAccount account);
 
     TransactionBuilder amount(BigDecimal amount);
 

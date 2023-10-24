@@ -4,13 +4,16 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * A Credit Transfer
  */
 public interface CreditTransfer {
 
-    BankAccount getDebtor();
+    Optional<Party> getDebtor();
+
+    BankAccount getDebtorAccount();
 
     String getId();
 

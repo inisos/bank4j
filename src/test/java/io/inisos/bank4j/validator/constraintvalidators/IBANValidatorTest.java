@@ -1,7 +1,7 @@
 package io.inisos.bank4j.validator.constraintvalidators;
 
 import io.inisos.bank4j.BankAccount;
-import io.inisos.bank4j.impl.SimpleBankAccount;
+import io.inisos.bank4j.impl.SimpleBankAccountBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ class IBANValidatorTest {
     @Test
     void isValid_pass_with_valid_IBAN() {
 
-        BankAccount invalidBankAccount = new SimpleBankAccount("Banque de France", "FR7630001007941234567890185");
+        BankAccount invalidBankAccount = new SimpleBankAccountBuilder().iban("FR7630001007941234567890185").build();
 
         Set<ConstraintViolation<BankAccount>> constraintViolations =
                 validator.validate(invalidBankAccount);
@@ -37,7 +37,7 @@ class IBANValidatorTest {
     @Test
     void isValid_fail_with_invalid_IBAN() {
 
-        BankAccount invalidBankAccount = new SimpleBankAccount("Name", "x");
+        BankAccount invalidBankAccount = new SimpleBankAccountBuilder().iban("x").build();
 
         Set<ConstraintViolation<BankAccount>> constraintViolations =
                 validator.validate(invalidBankAccount);

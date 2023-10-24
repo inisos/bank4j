@@ -17,7 +17,9 @@ public interface CreditTransferOperationBuilder {
 
     CreditTransferOperationBuilder serviceLevelCode(String serviceLevelCode);
 
-    CreditTransferOperationBuilder debtor(BankAccount debtor);
+    CreditTransferOperationBuilder debtor(Party debtor);
+
+    CreditTransferOperationBuilder debtorAccount(BankAccount debtorAccount);
 
     CreditTransferOperationBuilder transactions(Collection<Transaction> transactions);
 
