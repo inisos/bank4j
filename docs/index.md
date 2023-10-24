@@ -13,7 +13,7 @@ Written in Java 8 using JAXB and [iban4j](https://github.com/arturmkrtchyan/iban
 <dependency>
     <groupId>io.inisos.bank4j</groupId>
     <artifactId>bank4j</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 
@@ -74,7 +74,9 @@ class MyApp {
         // transfer
         CreditTransfer creditTransfer = Bank.creditTransferSepa(
                 debtor,
-                transactions);
+                transactions,
+                LocalDate.now().plusDays(2) // optional requested execution date, defaults to tomorrow
+        );
 
         // export to string
         String formattedOutput = creditTransfer.marshal(true); // true: enables formatting
