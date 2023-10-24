@@ -45,7 +45,7 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
         <!-- Dependency versions -->
-        <iban4j.version>3.2.4-RELEASE</iban4j.version>
+        <iban4j.version>3.2.7-RELEASE</iban4j.version>
         <jakarta-validation-api.version>2.0.2</jakarta-validation-api.version>
         <jakarta-xml-bind-api.version>2.3.3</jakarta-xml-bind-api.version>
         <jaxb-runtime.version>2.3.8</jaxb-runtime.version>
