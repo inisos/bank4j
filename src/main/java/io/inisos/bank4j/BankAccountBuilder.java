@@ -1,5 +1,8 @@
 package io.inisos.bank4j;
 
+/**
+ * @author Patrice Blanchardie
+ */
 public interface BankAccountBuilder {
     BankAccountBuilder iban(String iban);
 

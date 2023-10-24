@@ -1,7 +1,7 @@
 package io.inisos.bank4j.validator.constraintvalidators;
 
 import io.inisos.bank4j.BankAccount;
-import io.inisos.bank4j.impl.SimpleBankAccountBuilder;
+import io.inisos.bank4j.simple.SimpleBankAccountBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

@@ -1,7 +1,10 @@
-package io.inisos.bank4j.impl;
+package io.inisos.bank4j.simple;
 
 import io.inisos.bank4j.PostalAddress;
 
+/**
+ * @author Patrice Blanchardie
+ */
 public class SimplePartyBuilder implements io.inisos.bank4j.PartyBuilder {
     private String name;
     private PostalAddress postalAddress;

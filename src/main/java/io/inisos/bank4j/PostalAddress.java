@@ -3,6 +3,9 @@ package io.inisos.bank4j;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author Patrice Blanchardie
+ */
 public interface PostalAddress {
     Optional<String> getType();
 

@@ -5,8 +5,10 @@ import java.io.Writer;
 
 /**
  * An Operation that can be marshalled
+ *
+ * @author Patrice Blanchardie
  */
-public interface Operation {
+public interface Message {
 
     /**
      * Marshall as String without formatting

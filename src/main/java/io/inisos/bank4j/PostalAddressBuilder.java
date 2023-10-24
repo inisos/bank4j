@@ -2,6 +2,9 @@ package io.inisos.bank4j;
 
 import java.util.Collection;
 
+/**
+ * @author Patrice Blanchardie
+ */
 public interface PostalAddressBuilder {
     PostalAddressBuilder type(String type);
 

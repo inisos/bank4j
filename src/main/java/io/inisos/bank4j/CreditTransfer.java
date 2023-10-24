@@ -8,8 +8,12 @@ import java.util.Optional;
 
 /**
  * A Credit Transfer
+ *
+ * @author Patrice Blanchardie
  */
 public interface CreditTransfer {
+
+    String getServiceLevelCode();
 
     Optional<Party> getDebtor();
 

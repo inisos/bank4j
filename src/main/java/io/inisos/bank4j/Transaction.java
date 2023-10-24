@@ -5,6 +5,8 @@ import java.util.Optional;
 
 /**
  * Transaction
+ *
+ * @author Patrice Blanchardie
  */
 public interface Transaction {
 

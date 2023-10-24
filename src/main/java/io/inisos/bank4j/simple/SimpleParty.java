@@ -1,4 +1,4 @@
-package io.inisos.bank4j.impl;
+package io.inisos.bank4j.simple;
 
 import io.inisos.bank4j.Party;
 import io.inisos.bank4j.PostalAddress;
@@ -7,6 +7,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 
+/**
+ * @author Patrice Blanchardie
+ */
 public class SimpleParty implements Party {
     private final String name;
     private final PostalAddress postalAddress;

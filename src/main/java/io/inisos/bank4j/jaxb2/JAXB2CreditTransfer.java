@@ -1,4 +1,4 @@
-package io.inisos.bank4j.impl;
+package io.inisos.bank4j.jaxb2;
 
 import io.inisos.bank4j.*;
 import iso.std.iso._20022.tech.xsd.pain_001_001.*;
@@ -13,59 +13,31 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.namespace.QName;
 import java.io.Writer;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.StringJoiner;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * A JAXB ISO 20022 Credit Transfer with PAIN.001.001.03
  *
  * @author Patrice Blanchardie
  */
-public class JAXBCreditTransfer implements CreditTransferOperation {
+public class JAXB2CreditTransfer implements Message {
 
-    private static final DateTimeFormatter FORMAT_AS_ID = DateTimeFormatter.ofPattern("yyyyMMddhhmmss");
-
-    private final String serviceLevelCode;
-    private final Party debtor;
-    private final BankAccount debtorAccount;
-    private final Collection<Transaction> transactions;
-    private final String id;
-    private final LocalDateTime creationDateTime;
-    private final LocalDate requestedExecutionDate;
+    private final CreditTransfer creditTransfer;
 
     private final DatatypeFactory datatypeFactory;
 
     private final CustomerCreditTransferInitiationV03 customerCreditTransferInitiation;
 
-    /**
-     * Constructor
-     *
-     * @param serviceLevelCode       eg. "SEPA"
-     * @param debtor                 optional debtor
-     * @param debtorAccount          debtor account
-     * @param transactions           transactions (cannot contain duplicates)
-     * @param id                     optional identifier, defaults to execution date and time
-     * @param creationDateTime       optional message creation date and time, defaults to now
-     * @param requestedExecutionDate optional requested execution date and time, defaults to tomorrow
-     */
-    public JAXBCreditTransfer(String serviceLevelCode, Party debtor, BankAccount debtorAccount, Collection<Transaction> transactions, String id, LocalDateTime creationDateTime, LocalDate requestedExecutionDate) {
-        this.serviceLevelCode = Objects.requireNonNull(serviceLevelCode, "Service level code cannot be null");
-        this.debtor = debtor;
-        this.debtorAccount = Objects.requireNonNull(debtorAccount, "Debtor account cannot be null");
-        this.transactions = requireTransaction(Objects.requireNonNull(transactions));
-        this.creationDateTime = Optional.ofNullable(creationDateTime).orElse(LocalDateTime.now());
-        this.requestedExecutionDate = Optional.ofNullable(requestedExecutionDate).orElse(LocalDate.now().plusDays(1));
-        this.id = Optional.ofNullable(id).orElseGet(() -> FORMAT_AS_ID.format(this.creationDateTime));
+    public JAXB2CreditTransfer(CreditTransfer creditTransfer) {
+        this.creditTransfer = requireNonNull(creditTransfer, "Credit transfer cannot be null");
 
         try {
             this.datatypeFactory = DatatypeFactory.newInstance();
         } catch (DatatypeConfigurationException e) {
-            throw new XmlException(e);
+            throw new JAXB2Exception(e);
         }
         this.customerCreditTransferInitiation = build();
     }
@@ -82,7 +54,7 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
             jaxbMarshaller.marshal(createDocument(), writer);
 
         } catch (JAXBException e) {
-            throw new XmlException(e);
+            throw new JAXB2Exception(e);
         }
     }
 
@@ -109,26 +81,26 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         cti.setGrpHdr(header());
 
         PaymentInstructionInformation3 paymentInstructionInformationSCT3 = new PaymentInstructionInformation3();
-        paymentInstructionInformationSCT3.setPmtInfId(this.id);
+        paymentInstructionInformationSCT3.setPmtInfId(this.creditTransfer.getId());
         paymentInstructionInformationSCT3.setPmtMtd(PaymentMethod3Code.TRF);
         paymentInstructionInformationSCT3.setBtchBookg(false);
-        paymentInstructionInformationSCT3.setNbOfTxs(String.valueOf(this.transactions.size()));
-        paymentInstructionInformationSCT3.setCtrlSum(this.getTotalAmount());
-        paymentInstructionInformationSCT3.setDbtr(partyIdentification(this.debtor));
-        paymentInstructionInformationSCT3.setDbtrAcct(cashAccount(this.debtorAccount));
-        branchAndFinancialInstitutionIdentification(this.debtorAccount).ifPresent(paymentInstructionInformationSCT3::setDbtrAgt);
+        paymentInstructionInformationSCT3.setNbOfTxs(String.valueOf(this.creditTransfer.getTransactions().size()));
+        paymentInstructionInformationSCT3.setCtrlSum(this.creditTransfer.getTotalAmount());
+        paymentInstructionInformationSCT3.setDbtr(partyIdentification(this.creditTransfer.getDebtor().orElse(null)));
+        paymentInstructionInformationSCT3.setDbtrAcct(cashAccount(this.creditTransfer.getDebtorAccount()));
+        branchAndFinancialInstitutionIdentification(this.creditTransfer.getDebtorAccount()).ifPresent(paymentInstructionInformationSCT3::setDbtrAgt);
 
         ServiceLevel8Choice serviceLevel = new ServiceLevel8Choice();
-        serviceLevel.setCd(this.serviceLevelCode);
+        serviceLevel.setCd(this.creditTransfer.getServiceLevelCode());
         PaymentTypeInformation19 paymentTypeInformation = new PaymentTypeInformation19();
         paymentTypeInformation.setSvcLvl(serviceLevel);
         paymentInstructionInformationSCT3.setPmtTpInf(paymentTypeInformation);
 
-        paymentInstructionInformationSCT3.setReqdExctnDt(this.datatypeFactory.newXMLGregorianCalendar(DateTimeFormatter.ISO_LOCAL_DATE.format(requestedExecutionDate)));
+        paymentInstructionInformationSCT3.setReqdExctnDt(this.datatypeFactory.newXMLGregorianCalendar(DateTimeFormatter.ISO_LOCAL_DATE.format(this.creditTransfer.getRequestedExecutionDate())));
 
         paymentInstructionInformationSCT3.setChrgBr(ChargeBearerType1Code.SLEV);
 
-        for (Transaction transaction : this.transactions) {
+        for (Transaction transaction : this.creditTransfer.getTransactions()) {
             paymentInstructionInformationSCT3.getCdtTrfTxInf().add(transaction(transaction));
         }
 
@@ -139,11 +111,11 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
 
     private GroupHeader32 header() {
         GroupHeader32 head = new GroupHeader32();
-        head.setMsgId(id);
-        head.setCreDtTm(this.datatypeFactory.newXMLGregorianCalendar(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(creationDateTime)));
-        head.setNbOfTxs(String.valueOf(this.transactions.size()));
-        head.setCtrlSum(this.getTotalAmount());
-        head.setInitgPty(partyIdentification(this.debtor));
+        head.setMsgId(this.creditTransfer.getId());
+        head.setCreDtTm(this.datatypeFactory.newXMLGregorianCalendar(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(this.creditTransfer.getCreationDateTime())));
+        head.setNbOfTxs(String.valueOf(this.creditTransfer.getTransactions().size()));
+        head.setCtrlSum(this.creditTransfer.getTotalAmount());
+        head.setInitgPty(partyIdentification(this.creditTransfer.getDebtor().orElse(null)));
         return head;
     }
 
@@ -221,64 +193,4 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         return accountIdentification;
     }
 
-    @Override
-    public Optional<Party> getDebtor() {
-        return Optional.ofNullable(debtor);
-    }
-
-    @Override
-    public BankAccount getDebtorAccount() {
-        return debtorAccount;
-    }
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public LocalDateTime getCreationDateTime() {
-        return creationDateTime;
-    }
-
-    @Override
-    public LocalDate getRequestedExecutionDate() {
-        return requestedExecutionDate;
-    }
-
-    @Override
-    public Collection<Transaction> getTransactions() {
-        return transactions;
-    }
-
-    private <T> Collection<T> requireTransaction(Collection<T> collection) {
-        if (collection.isEmpty()) {
-            throw new IllegalArgumentException("At least 1 transaction is required");
-        }
-        return collection;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof JAXBCreditTransfer)) return false;
-        JAXBCreditTransfer that = (JAXBCreditTransfer) o;
-        return serviceLevelCode.equals(that.serviceLevelCode) && debtor.equals(that.debtor) && getTransactions().equals(that.getTransactions()) && id.equals(that.id) && creationDateTime.equals(that.creationDateTime) && requestedExecutionDate.equals(that.requestedExecutionDate);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(serviceLevelCode, debtor, getTransactions(), id, creationDateTime, requestedExecutionDate);
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", JAXBCreditTransfer.class.getSimpleName() + "[", "]")
-                .add("serviceLevelCode='" + serviceLevelCode + "'")
-                .add("debtor=" + debtor)
-                .add("id='" + id + "'")
-                .add("creationDateTime=" + creationDateTime)
-                .add("requestedExecutionDate=" + requestedExecutionDate)
-                .toString();
-    }
 }

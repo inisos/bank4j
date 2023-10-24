@@ -1,4 +1,4 @@
-package io.inisos.bank4j.impl;
+package io.inisos.bank4j.simple;
 
 import io.inisos.bank4j.BankAccount;
 import io.inisos.bank4j.Party;
@@ -7,6 +7,9 @@ import io.inisos.bank4j.TransactionBuilder;
 import java.math.BigDecimal;
 import java.util.Currency;
 
+/**
+ * @author Patrice Blanchardie
+ */
 public class SimpleTransactionBuilder implements TransactionBuilder {
     private Party party;
     private BankAccount account;

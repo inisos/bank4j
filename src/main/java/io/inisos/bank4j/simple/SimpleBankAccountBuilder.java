@@ -1,7 +1,10 @@
-package io.inisos.bank4j.impl;
+package io.inisos.bank4j.simple;
 
 import io.inisos.bank4j.BankAccountBuilder;
 
+/**
+ * @author Patrice Blanchardie
+ */
 public class SimpleBankAccountBuilder implements BankAccountBuilder {
 
     private String iban;

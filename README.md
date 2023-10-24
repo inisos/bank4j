@@ -44,27 +44,27 @@ Only accepts valid IBAN, BIC8 and BIC11.
 Simply provide bank account details and transactions:
 
 ```java
-import io.inisos.bank4j.Bank;
-
 class MyApp {
 
     public static void main(String... args) {
 
+        Builders builders = SimpleBuilders.get();
+
         // Optional debtor identification
-        Party debtor = Bank.simpleParty()
+        Party debtor = builders.party()
                 .name("Debtor Name") // Optional name
                 .build();
 
         // Debtor account
-        BankAccount debtorAccount = Bank.simpleBankAccount()
+        BankAccount debtorAccount = builders.bankAccount()
                 .iban("FR7610011000201234567890188") // IBAN
                 .bic("PSSTFRPP")                     // Optional BIC
                 .build();
 
         // Optional creditor identification
-        Party creditor = Bank.simpleParty()
+        Party creditor = builders.party()
                 .name("Creditor Name")                    // Optional name
-                .postalAddress(Bank.simplePostalAddress() // Optional postal address
+                .postalAddress(builders.postalAddress() // Optional postal address
                         .addressLine("1, rue de La Vrillière")
                         .addressLine("75001 PARIS")
                         .country("FR")
@@ -72,13 +72,13 @@ class MyApp {
                 .build();
 
         // Creditor account
-        BankAccount creditorAccount = Bank.simpleBankAccount()
+        BankAccount creditorAccount = builders.bankAccount()
                 .iban("FR7630001007941234567890185") // IBAN
                 .bic("BDFEFRPP")                     // Optional BIC
                 .build();
 
         // Transactions
-        Transaction transaction1 = Bank.simpleTransaction()
+        Transaction transaction1 = builders.transaction()
                 .party(creditor)                    // Optional creditor identification
                 .account(creditorAccount)           // Creditor account
                 .amount("12.34")                    // Amount, converted to BigDecimal
@@ -86,7 +86,7 @@ class MyApp {
                 .endToEndId("Transfer reference 1") // End to end identifier
                 .id("Optional identifier 1")        // Optional Transaction identifier
                 .build();
-        Transaction transaction2 = Bank.simpleTransaction()
+        Transaction transaction2 = builders.transaction()
                 .party(creditor)                    // Optional creditor identification
                 .account(creditorAccount)           // Creditor account
                 .amount(new BigDecimal("56.78"))    // Amount as BigDecimal
@@ -96,7 +96,7 @@ class MyApp {
                 .build();
 
         // Transfer
-        CreditTransferOperation creditTransfer = Bank.jaxbCreditTransferSepa()
+        JAXB2CreditTransfer jaxb2CreditTransfer = new JAXB2CreditTransfer(builders.creditTransferSepa()
                 .debtor(debtor)                                      // Optional debtor
                 .debtorAccount(debtorAccount)                        // Mandatory debtor account
                 .transaction(transaction1)                           // At least 1 transaction
@@ -104,13 +104,13 @@ class MyApp {
                 .creationDateTime(LocalDateTime.now())               // Optional message creation date and time, defaults to now
                 .requestedExecutionDate(LocalDate.now().plusDays(1)) // Optional requested execution date, defaults to tomorrow
                 .id("MYID")                                          // Optional identifier, defaults to creation date and time as yyyyMMddhhmmss
-                .build();
+                .build());
 
         // export to string
-        String formattedOutput = creditTransfer.marshal(true); // true: enables formatting
+        String formattedOutput = jaxb2CreditTransfer.marshal(true); // true: enables formatting
 
         // or export to file
-        creditTransfer.marshal(new FileWriter("myFile.xml")); // default: disables formatting
+        jaxb2CreditTransfer.marshal(new FileWriter("myFile.xml")); // default: disables formatting
     }
 }
 ```

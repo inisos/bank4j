@@ -3,6 +3,9 @@ package io.inisos.bank4j;
 import java.math.BigDecimal;
 import java.util.Currency;
 
+/**
+ * @author Patrice Blanchardie
+ */
 public interface TransactionBuilder {
 
     TransactionBuilder party(Party party);

@@ -4,6 +4,8 @@ import java.util.Optional;
 
 /**
  * Bank Account
+ *
+ * @author Patrice Blanchardie
  */
 public interface BankAccount {
 

@@ -1,9 +1,12 @@
-package io.inisos.bank4j.impl;
+package io.inisos.bank4j.simple;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * @author Patrice Blanchardie
+ */
 public class SimplePostalAddressBuilder implements io.inisos.bank4j.PostalAddressBuilder {
     private String type;
     private String department;

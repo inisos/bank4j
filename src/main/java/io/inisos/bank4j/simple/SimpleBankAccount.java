@@ -1,4 +1,4 @@
-package io.inisos.bank4j.impl;
+package io.inisos.bank4j.simple;
 
 import io.inisos.bank4j.BankAccount;
 import io.inisos.bank4j.validator.constraints.BIC;
