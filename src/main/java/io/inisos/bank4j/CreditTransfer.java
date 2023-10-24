@@ -8,21 +8,13 @@ import java.util.Collection;
 /**
  * A Credit Transfer
  */
-public interface CreditTransfer extends Operation {
+public interface CreditTransfer {
 
     BankAccount getDebtor();
 
     String getId();
 
     LocalDateTime getCreationDateTime();
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    default LocalDateTime getExecutionDate() {
-        return getCreationDateTime();
-    }
 
     LocalDate getRequestedExecutionDate();
 

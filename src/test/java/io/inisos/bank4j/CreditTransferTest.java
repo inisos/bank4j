@@ -1,11 +1,9 @@
 package io.inisos.bank4j;
 
 import io.inisos.bank4j.impl.SimpleBankAccount;
-import io.inisos.bank4j.impl.SimpleTransaction;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -27,21 +25,28 @@ class CreditTransferTest {
 
         List<Transaction> transactions = new ArrayList<>();
         for (int i = 1; i < 10; i++)
-            transactions.add(new SimpleTransaction(
-                    new SimpleBankAccount(
+            transactions.add(Bank.simpleTransaction()
+                    .thirdParty(new SimpleBankAccount(
                             "Beneficiary " + i,
                             "FR7610011000201234567890188",
                             "PSSTFRPP"
-                    ),
-                    new BigDecimal(i + "12.34"),
-                    "EUR",
-                    "ENDTOEND" + i,
-                    "ID" + i));
+                    ))
+                    .amount(i + "12.34")
+                    .currency("EUR")
+                    .endToEndId("ENDTOEND" + i)
+                    .id("ID" + i)
+                    .build());
 
         LocalDateTime newYear2021 = LocalDateTime.of(2021, 1, 1, 0, 0, 0, 0);
         LocalDate nextDay = newYear2021.plusDays(1).toLocalDate();
 
-        CreditTransfer creditTransfer = Bank.creditTransferSepa(sender, transactions, "MYID", newYear2021, nextDay);
+        CreditTransferOperation creditTransfer = Bank.jaxbCreditTransferSepa()
+                .debtor(sender)
+                .transactions(transactions)
+                .id("MYID")
+                .creationDateTime(newYear2021)
+                .requestedExecutionDate(nextDay)
+                .build();
 
         System.out.println(creditTransfer.marshal(false));
 
@@ -59,20 +64,25 @@ class CreditTransferTest {
 
         List<Transaction> transactions = new ArrayList<>();
         for (int i = 1; i < 10; i++)
-            transactions.add(new SimpleTransaction(
-                    new SimpleBankAccount(
+            transactions.add(Bank.simpleTransaction()
+                    .thirdParty(new SimpleBankAccount(
                             "Beneficiary " + i,
                             "FR7610011000201234567890188"
-                    ),
-                    new BigDecimal(i + "12.34"),
-                    "EUR",
-                    "ENDTOEND" + i,
-                    null));
+                    ))
+                    .amount(i + "12.34")
+                    .currency("EUR")
+                    .endToEndId("ENDTOEND" + i)
+                    .build());
 
         LocalDateTime newYear2021 = LocalDateTime.of(2021, 1, 1, 0, 0, 0, 0);
         LocalDate nextDay = newYear2021.plusDays(1).toLocalDate();
 
-        CreditTransfer creditTransfer = Bank.creditTransferSepa(sender, transactions, newYear2021, nextDay);
+        CreditTransferOperation creditTransfer = Bank.jaxbCreditTransferSepa()
+                .debtor(sender)
+                .transactions(transactions)
+                .creationDateTime(newYear2021)
+                .requestedExecutionDate(nextDay)
+                .build();
 
         System.out.println(creditTransfer.marshal(false));
 

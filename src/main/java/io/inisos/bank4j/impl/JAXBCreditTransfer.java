@@ -1,7 +1,7 @@
 package io.inisos.bank4j.impl;
 
 import io.inisos.bank4j.BankAccount;
-import io.inisos.bank4j.CreditTransfer;
+import io.inisos.bank4j.CreditTransferOperation;
 import io.inisos.bank4j.Transaction;
 import iso.std.iso._20022.tech.xsd.pain_001_001.*;
 import org.iban4j.BicUtil;
@@ -28,7 +28,7 @@ import java.util.StringJoiner;
  *
  * @author Patrice Blanchardie
  */
-public class JAXBCreditTransfer implements CreditTransfer {
+public class JAXBCreditTransfer implements CreditTransferOperation {
 
     private static final DateTimeFormatter FORMAT_AS_ID = DateTimeFormatter.ofPattern("yyyyMMddhhmmss");
 
@@ -46,21 +46,6 @@ public class JAXBCreditTransfer implements CreditTransfer {
     /**
      * Constructor
      *
-     * @param serviceLevelCode eg. "SEPA"
-     * @param debtor           debtor account
-     * @param transactions     transactions (cannot contain duplicates)
-     * @param id               optional identifier, defaults to execution date and time
-     * @param creationDateTime optional execution date and time, defaults to now
-     * @deprecated use full constructor
-     */
-    @Deprecated
-    public JAXBCreditTransfer(String serviceLevelCode, BankAccount debtor, Collection<Transaction> transactions, String id, LocalDateTime creationDateTime) {
-        this(serviceLevelCode, debtor, transactions, id, creationDateTime, null);
-    }
-
-    /**
-     * Constructor
-     *
      * @param serviceLevelCode       eg. "SEPA"
      * @param debtor                 debtor account
      * @param transactions           transactions (cannot contain duplicates)
@@ -71,7 +56,7 @@ public class JAXBCreditTransfer implements CreditTransfer {
     public JAXBCreditTransfer(String serviceLevelCode, BankAccount debtor, Collection<Transaction> transactions, String id, LocalDateTime creationDateTime, LocalDate requestedExecutionDate) {
         this.serviceLevelCode = Objects.requireNonNull(serviceLevelCode);
         this.debtor = Objects.requireNonNull(debtor);
-        this.transactions = Objects.requireNonNull(transactions);
+        this.transactions = requireTransaction(Objects.requireNonNull(transactions));
         this.creationDateTime = Optional.ofNullable(creationDateTime).orElse(LocalDateTime.now());
         this.requestedExecutionDate = Optional.ofNullable(requestedExecutionDate).orElse(LocalDate.now().plusDays(1));
         this.id = Optional.ofNullable(id).orElseGet(() -> FORMAT_AS_ID.format(this.creationDateTime));
@@ -242,6 +227,13 @@ public class JAXBCreditTransfer implements CreditTransfer {
     @Override
     public Collection<Transaction> getTransactions() {
         return transactions;
+    }
+
+    private <T> Collection<T> requireTransaction(Collection<T> collection) {
+        if (collection.isEmpty()) {
+            throw new IllegalArgumentException("At least 1 transaction is required");
+        }
+        return collection;
     }
 
     @Override

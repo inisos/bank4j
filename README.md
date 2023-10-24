@@ -61,26 +61,30 @@ class MyApp {
                 "BDFEFRPP"                     // BIC (optional)
         );
         // transactions
-        Transaction transaction1 = new SimpleTransaction(
-                creditor,                   // Beneficiary bank account
-                new BigDecimal("12.34"),    // Amount
-                "EUR",                      // Currency code
-                "Transfer reference 1",     // End to end identifier
-                "Optional identifier 1");   // Transaction identifier (optional)
-        Transaction transaction2 = new SimpleTransaction(
-                creditor,                   // Beneficiary bank account
-                new BigDecimal("56.78"),    // Amount
-                "EUR",                      // Currency code
-                "Transfer reference 2",     // End to end identifier
-                "Optional identifier 2");   // Transaction identifier (optional)
-        Collection<Transaction> transactions = Arrays.asList(transaction1, transaction2);
+        Transaction transaction1 = Bank.simpleTransaction()
+                .thirdParty(creditor)               // Beneficiary bank account
+                .amount("12.34")                    // Amount, converted to BigDecimal
+                .currency("EUR")                    // Currency code
+                .endToEndId("Transfer reference 1") // End to end identifier
+                .id("Optional identifier 1")        // Transaction identifier (optional)
+                .build();
+        Transaction transaction2 = Bank.simpleTransaction()
+                .thirdParty(creditor)               // Beneficiary bank account
+                .amount(new BigDecimal("56.78"))    // Amount as BigDecimal
+                .currency("EUR")                    // Currency code
+                .endToEndId("Transfer reference 2") // End to end identifier
+                .id("Optional identifier 2")        // Transaction identifier (optional)
+                .build();
 
         // transfer
-        CreditTransfer creditTransfer = Bank.creditTransferSepa(
-                debtor,
-                transactions,
-                LocalDate.now().plusDays(2) // optional requested execution date, defaults to tomorrow
-        );
+        CreditTransferOperation creditTransfer = Bank.jaxbCreditTransferSepa()
+                .debtor(debtor)                                      // mandatory debtor
+                .transaction(transaction1)                           // at least 1 transaction
+                .transaction(transaction2)                           // optional additional transaction
+                .creationDateTime(LocalDateTime.now())               // optional message creation date and time, defaults to now
+                .requestedExecutionDate(LocalDate.now().plusDays(1)) // optional requested execution date, defaults to tomorrow
+                .id("MYID")                                          // optional identifier, defaults to reation date and time as yyyyMMddhhmmss
+                .build();
 
         // export to string
         String formattedOutput = creditTransfer.marshal(true); // true: enables formatting
@@ -107,7 +111,7 @@ Output with formatting:
             </InitgPty>
         </GrpHdr>
         <PmtInf>
-            <PmtInfId>20210104054241</PmtInfId>
+            <PmtInfId>MYID</PmtInfId>
             <PmtMtd>TRF</PmtMtd>
             <BtchBookg>false</BtchBookg>
             <NbOfTxs>2</NbOfTxs>

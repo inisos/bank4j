@@ -21,18 +21,6 @@ public class SimpleTransaction implements Transaction {
     private final String endToEndId;
     private final String id;
 
-    public SimpleTransaction(BankAccount thirdParty, BigDecimal amount, Currency currency, String endToEndId) {
-        this(thirdParty, amount, currency, endToEndId, null);
-    }
-
-    public SimpleTransaction(BankAccount thirdParty, BigDecimal amount, String currencyCode, String endToEndId) {
-        this(thirdParty, amount, Currency.getInstance(currencyCode), endToEndId, null);
-    }
-
-    public SimpleTransaction(BankAccount thirdParty, BigDecimal amount, String currencyCode, String endToEndId, String id) {
-        this(thirdParty, amount, Currency.getInstance(currencyCode), endToEndId, id);
-    }
-
     public SimpleTransaction(BankAccount thirdParty, BigDecimal amount, Currency currency, String endToEndId, String id) {
         this.thirdParty = Objects.requireNonNull(thirdParty);
         this.amount = Objects.requireNonNull(amount);
