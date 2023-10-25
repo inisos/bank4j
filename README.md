@@ -61,34 +61,33 @@ class MyApp {
                 .bic("PSSTFRPP")                     // Optional BIC
                 .build();
 
-        // Optional creditor identification
-        Party creditor = Bank.simpleParty()
-                .name("Creditor Name")                    // Optional name
-                .postalAddress(Bank.simplePostalAddress() // Optional postal address
-                        .addressLine("1, rue de La Vrillière")
-                        .addressLine("75001 PARIS")
-                        .country("FR")
-                        .build())
-                .build();
-
-        // Creditor account
-        BankAccount creditorAccount = Bank.simpleBankAccount()
-                .iban("FR7630001007941234567890185") // IBAN
-                .bic("BDFEFRPP")                     // Optional BIC
-                .build();
-
         // Transactions
         Transaction transaction1 = Bank.simpleTransaction()
-                .party(creditor)                    // Optional creditor identification
-                .account(creditorAccount)           // Creditor account
+                .party(Bank.simpleParty()           // Optional creditor identification
+                        .name("BANQUE DE FRANCE")                 // Optional name
+                        .postalAddress(Bank.simplePostalAddress() // Optional postal address
+                                .addressLine("1, rue de La Vrillière")
+                                .addressLine("75001 PARIS")
+                                .country("FR")
+                                .build())
+                        .build())
+                .account(Bank.simpleBankAccount()   // Creditor account
+                        .iban("FR7630001007941234567890185") // IBAN
+                        .bic("BDFEFRPP")                     // Optional BIC
+                        .build())           
                 .amount("12.34")                    // Amount, converted to BigDecimal
                 .currency("EUR")                    // Currency code
                 .endToEndId("Transfer reference 1") // End to end identifier
                 .id("Optional identifier 1")        // Optional Transaction identifier
                 .build();
         Transaction transaction2 = Bank.simpleTransaction()
-                .party(creditor)                    // Optional creditor identification
-                .account(creditorAccount)           // Creditor account
+                .party(Bank.simpleParty()           // Optional creditor identification
+                        .name("Creditor Name")                    // Optional name
+                        .build())                    
+                .account(Bank.simpleBankAccount()   // Creditor account
+                        .otherId("1234567890")               // Other identification
+                        .bic("BDFEFRPP")                     // BIC
+                        .build())           // Creditor account
                 .amount(new BigDecimal("56.78"))    // Amount as BigDecimal
                 .currency("EUR")                    // Currency code
                 .endToEndId("Transfer reference 2") // End to end identifier
@@ -123,7 +122,7 @@ Output with formatting:
     <CstmrCdtTrfInitn>
         <GrpHdr>
             <MsgId>MYID</MsgId>
-            <CreDtTm>2023-10-24T16:27:53.594</CreDtTm>
+            <CreDtTm>2023-10-25T09:47:05.187</CreDtTm>
             <NbOfTxs>2</NbOfTxs>
             <CtrlSum>69.12</CtrlSum>
             <InitgPty>
@@ -141,7 +140,7 @@ Output with formatting:
                     <Cd>SEPA</Cd>
                 </SvcLvl>
             </PmtTpInf>
-            <ReqdExctnDt>2023-10-25</ReqdExctnDt>
+            <ReqdExctnDt>2023-10-26</ReqdExctnDt>
             <Dbtr>
                 <Nm>Debtor Name</Nm>
             </Dbtr>
@@ -170,7 +169,7 @@ Output with formatting:
                     </FinInstnId>
                 </CdtrAgt>
                 <Cdtr>
-                    <Nm>Creditor Name</Nm>
+                    <Nm>BANQUE DE FRANCE</Nm>
                     <PstlAdr>
                         <Ctry>FR</Ctry>
                         <AdrLine>1, rue de La Vrillière</AdrLine>
@@ -198,15 +197,12 @@ Output with formatting:
                 </CdtrAgt>
                 <Cdtr>
                     <Nm>Creditor Name</Nm>
-                    <PstlAdr>
-                        <Ctry>FR</Ctry>
-                        <AdrLine>1, rue de La Vrillière</AdrLine>
-                        <AdrLine>75001 PARIS</AdrLine>
-                    </PstlAdr>
                 </Cdtr>
                 <CdtrAcct>
                     <Id>
-                        <IBAN>FR7630001007941234567890185</IBAN>
+                        <Othr>
+                            <Id>1234567890</Id>
+                        </Othr>
                     </Id>
                 </CdtrAcct>
             </CdtTrfTxInf>
