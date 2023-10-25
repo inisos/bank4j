@@ -10,6 +10,7 @@ public class SimpleBankAccountBuilder implements BankAccountBuilder {
     private String iban;
     private String bic;
     private String name;
+    private String otherId;
 
     @Override
     public SimpleBankAccountBuilder iban(String iban) {
@@ -30,7 +31,13 @@ public class SimpleBankAccountBuilder implements BankAccountBuilder {
     }
 
     @Override
+    public SimpleBankAccountBuilder otherId(String otherId) {
+        this.otherId = otherId;
+        return this;
+    }
+
+    @Override
     public SimpleBankAccount build() {
-        return new SimpleBankAccount(iban, bic, name);
+        return new SimpleBankAccount(iban, bic, name, otherId);
     }
 }

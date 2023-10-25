@@ -77,6 +77,51 @@ class JAXB2CreditTransferTest {
     }
 
     @Test
+    void test_with_account_other_id() {
+
+        final Party debtor = builders.party()
+                .name("Banque de France")
+                .build();
+        final BankAccount debtorAccount = builders.bankAccount()
+                .iban("FR7630001007941234567890185")
+                .bic("BDFEFRPPXXX")
+                .name("Compte de la Banque de France")
+                .build();
+
+        Transaction transaction = builders.transaction()
+                .party(builders.party()
+                        .name("Debtor")
+                        .build())
+                .account(builders.bankAccount()
+                        .otherId("1234567890")
+                        .bic("PSSTFRPP")
+                        .name("Debtor Account")
+                        .build())
+                .amount("12.34")
+                .currency("EUR")
+                .endToEndId("ENDTOEND1")
+                .id("ID1")
+                .build();
+
+        LocalDateTime newYear2021 = LocalDateTime.of(2021, 1, 1, 0, 0, 0, 0);
+        LocalDate nextDay = newYear2021.plusDays(1).toLocalDate();
+
+        JAXB2CreditTransfer jaxb2CreditTransfer = new JAXB2CreditTransfer(builders.creditTransferSepa()
+                .debtor(debtor)
+                .debtorAccount(debtorAccount)
+                .transaction(transaction)
+                .id("MYID")
+                .creationDateTime(newYear2021)
+                .requestedExecutionDate(nextDay)
+                .build());
+
+        System.out.println(jaxb2CreditTransfer.marshal(false));
+
+        Assertions.assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Document xmlns=\"urn:iso:std:iso:20022:tech:xsd:pain.001.001.03\"><CstmrCdtTrfInitn><GrpHdr><MsgId>MYID</MsgId><CreDtTm>2021-01-01T00:00:00</CreDtTm><NbOfTxs>1</NbOfTxs><CtrlSum>12.34</CtrlSum><InitgPty><Nm>Banque de France</Nm></InitgPty></GrpHdr><PmtInf><PmtInfId>MYID</PmtInfId><PmtMtd>TRF</PmtMtd><BtchBookg>false</BtchBookg><NbOfTxs>1</NbOfTxs><CtrlSum>12.34</CtrlSum><PmtTpInf><SvcLvl><Cd>SEPA</Cd></SvcLvl></PmtTpInf><ReqdExctnDt>2021-01-02</ReqdExctnDt><Dbtr><Nm>Banque de France</Nm></Dbtr><DbtrAcct><Id><IBAN>FR7630001007941234567890185</IBAN></Id><Nm>Compte de la Banque de France</Nm></DbtrAcct><DbtrAgt><FinInstnId><BIC>BDFEFRPPXXX</BIC></FinInstnId></DbtrAgt><ChrgBr>SLEV</ChrgBr><CdtTrfTxInf><PmtId><InstrId>ID1</InstrId><EndToEndId>ENDTOEND1</EndToEndId></PmtId><Amt><InstdAmt Ccy=\"EUR\">12.34</InstdAmt></Amt><CdtrAgt><FinInstnId><BIC>PSSTFRPP</BIC></FinInstnId></CdtrAgt><Cdtr><Nm>Debtor</Nm></Cdtr><CdtrAcct><Id><Othr><Id>1234567890</Id></Othr></Id><Nm>Debtor Account</Nm></CdtrAcct></CdtTrfTxInf></PmtInf></CstmrCdtTrfInitn></Document>",
+                jaxb2CreditTransfer.marshal());
+    }
+
+    @Test
     void test_with_unstructured_address() {
 
         final Party debtor = builders.party()

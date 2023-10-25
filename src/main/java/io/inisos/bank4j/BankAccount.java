@@ -12,10 +12,10 @@ public interface BankAccount {
     /**
      * @return IBAN
      */
-    String getIban();
+    Optional<String> getIban();
 
     /**
-     * @return BIC, can be null
+     * @return BIC
      */
     Optional<String> getBic();
 
@@ -23,4 +23,9 @@ public interface BankAccount {
      * @return name
      */
     Optional<String> getName();
+
+    /**
+     * @return other account identifier
+     */
+    Optional<String> getOtherId();
 }

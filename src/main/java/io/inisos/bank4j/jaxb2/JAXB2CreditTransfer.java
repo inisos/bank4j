@@ -187,9 +187,20 @@ public class JAXB2CreditTransfer implements Message {
     }
 
     private AccountIdentification4Choice accountIdentification(BankAccount bankAccount) {
-        IbanUtil.validate(bankAccount.getIban());
         AccountIdentification4Choice accountIdentification = new AccountIdentification4Choice();
-        accountIdentification.setIBAN(bankAccount.getIban());
+        Optional<String> optionalIban = bankAccount.getIban();
+        Optional<String> optionalOtherId = bankAccount.getOtherId();
+        if (optionalIban.isPresent()) {
+            String iban = optionalIban.get();
+            IbanUtil.validate(iban);
+            accountIdentification.setIBAN(iban);
+        } else if (optionalOtherId.isPresent()) {
+            GenericAccountIdentification1 genericAccountIdentification = new GenericAccountIdentification1();
+            genericAccountIdentification.setId(optionalOtherId.get());
+            accountIdentification.setOthr(genericAccountIdentification);
+        } else {
+            throw new Bank4jException("IBAN or otherId must be provided");
+        }
         return accountIdentification;
     }
 

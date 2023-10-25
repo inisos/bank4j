@@ -4,7 +4,6 @@ import io.inisos.bank4j.BankAccount;
 import io.inisos.bank4j.validator.constraints.BIC;
 import io.inisos.bank4j.validator.constraints.IBAN;
 
-import javax.validation.constraints.NotBlank;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -17,7 +16,6 @@ import java.util.StringJoiner;
 public class SimpleBankAccount implements BankAccount {
 
     @IBAN
-    @NotBlank
     private final String iban;
 
     @BIC
@@ -25,15 +23,19 @@ public class SimpleBankAccount implements BankAccount {
 
     private final String name;
 
-    public SimpleBankAccount(String iban, String bic, String name) {
-        this.iban = Objects.requireNonNull(iban, "IBAN is required");
+    private final String otherId;
+
+    public SimpleBankAccount(String iban, String bic, String name, String otherId) {
+        this.iban = iban;
         this.bic = bic;
         this.name = name;
+        this.otherId = otherId;
+        requireIdentification();
     }
 
     @Override
-    public String getIban() {
-        return iban;
+    public Optional<String> getIban() {
+        return Optional.ofNullable(iban);
     }
 
     @Override
@@ -47,16 +49,27 @@ public class SimpleBankAccount implements BankAccount {
     }
 
     @Override
+    public Optional<String> getOtherId() {
+        return Optional.ofNullable(otherId);
+    }
+
+    private void requireIdentification() {
+        if ((iban == null || iban.isEmpty()) && (otherId == null || otherId.isEmpty())) {
+            throw new IllegalArgumentException("IBAN or otherId must be provided");
+        }
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SimpleBankAccount)) return false;
         SimpleBankAccount that = (SimpleBankAccount) o;
-        return Objects.equals(iban, that.iban);
+        return Objects.equals(iban, that.iban) && Objects.equals(otherId, that.otherId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(iban);
+        return Objects.hash(iban, otherId);
     }
 
     @Override
@@ -65,6 +78,7 @@ public class SimpleBankAccount implements BankAccount {
                 .add("iban='" + iban + "'")
                 .add("bic='" + bic + "'")
                 .add("name='" + name + "'")
+                .add("otherId='" + otherId + "'")
                 .toString();
     }
 }

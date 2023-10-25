@@ -10,5 +10,7 @@ public interface BankAccountBuilder {
 
     BankAccountBuilder name(String name);
 
+    BankAccountBuilder otherId(String otherId);
+
     BankAccount build();
 }
