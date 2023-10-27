@@ -13,7 +13,7 @@ import java.util.Optional;
  */
 public interface CreditTransfer {
 
-    String getServiceLevelCode();
+    Optional<String> getServiceLevelCode();
 
     Optional<Party> getDebtor();
 

@@ -33,7 +33,7 @@ public class SimpleCreditTransfer implements CreditTransfer {
     /**
      * Constructor
      *
-     * @param serviceLevelCode       eg. "SEPA"
+     * @param serviceLevelCode       optional e.g. "SEPA"
      * @param debtor                 optional debtor
      * @param debtorAccount          debtor account
      * @param transactions           transactions (cannot contain duplicates)
@@ -42,7 +42,7 @@ public class SimpleCreditTransfer implements CreditTransfer {
      * @param requestedExecutionDate optional requested execution date and time, defaults to tomorrow
      */
     public SimpleCreditTransfer(String serviceLevelCode, Party debtor, BankAccount debtorAccount, Collection<Transaction> transactions, String id, LocalDateTime creationDateTime, LocalDate requestedExecutionDate) {
-        this.serviceLevelCode = Objects.requireNonNull(serviceLevelCode, "Service level code cannot be null");
+        this.serviceLevelCode = serviceLevelCode;
         this.debtor = debtor;
         this.debtorAccount = Objects.requireNonNull(debtorAccount, "Debtor account cannot be null");
         this.transactions = requireTransaction(Objects.requireNonNull(transactions));
@@ -52,8 +52,8 @@ public class SimpleCreditTransfer implements CreditTransfer {
     }
 
     @Override
-    public String getServiceLevelCode() {
-        return serviceLevelCode;
+    public Optional<String> getServiceLevelCode() {
+        return Optional.ofNullable(serviceLevelCode);
     }
 
     @Override

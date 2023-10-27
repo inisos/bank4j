@@ -90,11 +90,13 @@ public class JAXB2CreditTransfer implements Message {
         paymentInstructionInformationSCT3.setDbtrAcct(cashAccount(this.creditTransfer.getDebtorAccount()));
         branchAndFinancialInstitutionIdentification(this.creditTransfer.getDebtorAccount()).ifPresent(paymentInstructionInformationSCT3::setDbtrAgt);
 
-        ServiceLevel8Choice serviceLevel = new ServiceLevel8Choice();
-        serviceLevel.setCd(this.creditTransfer.getServiceLevelCode());
-        PaymentTypeInformation19 paymentTypeInformation = new PaymentTypeInformation19();
-        paymentTypeInformation.setSvcLvl(serviceLevel);
-        paymentInstructionInformationSCT3.setPmtTpInf(paymentTypeInformation);
+        this.creditTransfer.getServiceLevelCode().ifPresent(serviceLevelCode -> {
+            ServiceLevel8Choice serviceLevel = new ServiceLevel8Choice();
+            serviceLevel.setCd(serviceLevelCode);
+            PaymentTypeInformation19 paymentTypeInformation = new PaymentTypeInformation19();
+            paymentTypeInformation.setSvcLvl(serviceLevel);
+            paymentInstructionInformationSCT3.setPmtTpInf(paymentTypeInformation);
+        });
 
         paymentInstructionInformationSCT3.setReqdExctnDt(this.datatypeFactory.newXMLGregorianCalendar(DateTimeFormatter.ISO_LOCAL_DATE.format(this.creditTransfer.getRequestedExecutionDate())));
 
