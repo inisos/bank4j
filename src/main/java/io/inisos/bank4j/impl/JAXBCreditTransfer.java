@@ -45,7 +45,7 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
     /**
      * Constructor
      *
-     * @param serviceLevelCode       eg. "SEPA"
+     * @param serviceLevelCode       optional e.g. "SEPA"
      * @param debtor                 optional debtor
      * @param debtorAccount          debtor account
      * @param transactions           transactions (cannot contain duplicates)
@@ -54,7 +54,7 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
      * @param requestedExecutionDate optional requested execution date and time, defaults to tomorrow
      */
     public JAXBCreditTransfer(String serviceLevelCode, Party debtor, BankAccount debtorAccount, Collection<Transaction> transactions, String id, LocalDateTime creationDateTime, LocalDate requestedExecutionDate) {
-        this.serviceLevelCode = Objects.requireNonNull(serviceLevelCode, "Service level code cannot be null");
+        this.serviceLevelCode = serviceLevelCode;
         this.debtor = debtor;
         this.debtorAccount = Objects.requireNonNull(debtorAccount, "Debtor account cannot be null");
         this.transactions = requireTransaction(Objects.requireNonNull(transactions));
@@ -118,11 +118,13 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         paymentInstructionInformationSCT3.setDbtrAcct(cashAccount(this.debtorAccount));
         branchAndFinancialInstitutionIdentification(this.debtorAccount).ifPresent(paymentInstructionInformationSCT3::setDbtrAgt);
 
-        ServiceLevel8Choice serviceLevel = new ServiceLevel8Choice();
-        serviceLevel.setCd(this.serviceLevelCode);
-        PaymentTypeInformation19 paymentTypeInformation = new PaymentTypeInformation19();
-        paymentTypeInformation.setSvcLvl(serviceLevel);
-        paymentInstructionInformationSCT3.setPmtTpInf(paymentTypeInformation);
+        if(this.serviceLevelCode != null) {
+            ServiceLevel8Choice serviceLevel = new ServiceLevel8Choice();
+            serviceLevel.setCd(this.serviceLevelCode);
+            PaymentTypeInformation19 paymentTypeInformation = new PaymentTypeInformation19();
+            paymentTypeInformation.setSvcLvl(serviceLevel);
+            paymentInstructionInformationSCT3.setPmtTpInf(paymentTypeInformation);
+        }
 
         paymentInstructionInformationSCT3.setReqdExctnDt(this.datatypeFactory.newXMLGregorianCalendar(DateTimeFormatter.ISO_LOCAL_DATE.format(requestedExecutionDate)));
 
