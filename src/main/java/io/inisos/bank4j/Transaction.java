@@ -1,6 +1,7 @@
 package io.inisos.bank4j;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -39,4 +40,9 @@ public interface Transaction {
      * @return optional identifier
      */
     Optional<String> getId();
+
+    /**
+     * @return intermediary agents
+     */
+    List<BankAccount> getIntermediaryAgents();
 }

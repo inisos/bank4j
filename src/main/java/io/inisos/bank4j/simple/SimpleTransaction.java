@@ -5,10 +5,7 @@ import io.inisos.bank4j.Party;
 import io.inisos.bank4j.Transaction;
 
 import java.math.BigDecimal;
-import java.util.Currency;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.StringJoiner;
+import java.util.*;
 
 /**
  * Simple Transaction
@@ -23,14 +20,19 @@ public class SimpleTransaction implements Transaction {
     private final Currency currency;
     private final String endToEndId;
     private final String id;
+    private final List<BankAccount> intermediaryAgents;
 
-    public SimpleTransaction(Party party, BankAccount account, BigDecimal amount, Currency currency, String endToEndId, String id) {
+    public SimpleTransaction(Party party, BankAccount account, BigDecimal amount, Currency currency, String endToEndId, String id, List<BankAccount> intermediaryAgents) {
         this.party = party;
         this.account = Objects.requireNonNull(account, "Account cannot be null");
         this.amount = Objects.requireNonNull(amount, "Amount cannot be null");
         this.currency = Objects.requireNonNull(currency, "Currency cannot be null");
         this.endToEndId = Objects.requireNonNull(endToEndId, "End to end id cannot be null");
         this.id = id;
+        this.intermediaryAgents = Optional.ofNullable(intermediaryAgents).orElse(Collections.emptyList());
+        if (this.intermediaryAgents.size() > 3) {
+            throw new IllegalArgumentException("Intermediary agents cannot be more than 3");
+        }
     }
 
     @Override
@@ -61,6 +63,11 @@ public class SimpleTransaction implements Transaction {
     @Override
     public Optional<String> getId() {
         return Optional.ofNullable(id);
+    }
+
+    @Override
+    public List<BankAccount> getIntermediaryAgents() {
+        return intermediaryAgents;
     }
 
     @Override

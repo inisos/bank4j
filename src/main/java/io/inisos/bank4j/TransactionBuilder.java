@@ -2,6 +2,7 @@ package io.inisos.bank4j;
 
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.List;
 
 /**
  * @author Patrice Blanchardie
@@ -39,6 +40,10 @@ public interface TransactionBuilder {
     TransactionBuilder endToEndId(String endToEndId);
 
     TransactionBuilder id(String id);
+
+    TransactionBuilder intermediaryAgents(List<BankAccount> intermediaryAgents);
+
+    TransactionBuilder intermediaryAgent(BankAccount intermediaryAgent);
 
     Transaction build();
 }
