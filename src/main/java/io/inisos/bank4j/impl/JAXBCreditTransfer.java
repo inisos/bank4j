@@ -16,10 +16,7 @@ import java.io.Writer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.StringJoiner;
+import java.util.*;
 
 /**
  * A JAXB ISO 20022 Credit Transfer with PAIN.001.001.03
@@ -170,6 +167,22 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         creditTransferTransactionInformation.setCdtr(partyIdentification(transaction.getParty().orElse(null)));
         creditTransferTransactionInformation.setCdtrAcct(cashAccount(transaction.getAccount()));
         branchAndFinancialInstitutionIdentification(transaction.getAccount()).ifPresent(creditTransferTransactionInformation::setCdtrAgt);
+        Iterator<BankAccount> intermediaryAgentsIterator = transaction.getIntermediaryAgents().iterator();
+        if (intermediaryAgentsIterator.hasNext()) {
+            BankAccount first = intermediaryAgentsIterator.next();
+            creditTransferTransactionInformation.setIntrmyAgt1Acct(cashAccount(first));
+            branchAndFinancialInstitutionIdentification(first).ifPresent(creditTransferTransactionInformation::setIntrmyAgt1);
+        }
+        if (intermediaryAgentsIterator.hasNext()) {
+            BankAccount second = intermediaryAgentsIterator.next();
+            creditTransferTransactionInformation.setIntrmyAgt2Acct(cashAccount(second));
+            branchAndFinancialInstitutionIdentification(second).ifPresent(creditTransferTransactionInformation::setIntrmyAgt2);
+        }
+        if (intermediaryAgentsIterator.hasNext()) {
+            BankAccount third = intermediaryAgentsIterator.next();
+            creditTransferTransactionInformation.setIntrmyAgt3Acct(cashAccount(third));
+            branchAndFinancialInstitutionIdentification(third).ifPresent(creditTransferTransactionInformation::setIntrmyAgt3);
+        }
 
         return creditTransferTransactionInformation;
     }

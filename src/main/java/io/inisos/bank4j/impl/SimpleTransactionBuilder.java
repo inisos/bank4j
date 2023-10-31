@@ -5,7 +5,9 @@ import io.inisos.bank4j.Party;
 import io.inisos.bank4j.TransactionBuilder;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Currency;
+import java.util.List;
 
 public class SimpleTransactionBuilder implements TransactionBuilder {
     private Party party;
@@ -14,6 +16,7 @@ public class SimpleTransactionBuilder implements TransactionBuilder {
     private Currency currency;
     private String endToEndId;
     private String id;
+    private final List<BankAccount> intermediaryAgents = new ArrayList<>();
 
     @Override
     public SimpleTransactionBuilder party(Party party) {
@@ -52,7 +55,19 @@ public class SimpleTransactionBuilder implements TransactionBuilder {
     }
 
     @Override
+    public TransactionBuilder intermediaryAgents(List<BankAccount> intermediaryAgents) {
+        this.intermediaryAgents.addAll(intermediaryAgents);
+        return this;
+    }
+
+    @Override
+    public TransactionBuilder intermediaryAgent(BankAccount intermediaryAgent) {
+        this.intermediaryAgents.add(intermediaryAgent);
+        return this;
+    }
+
+    @Override
     public SimpleTransaction build() {
-        return new SimpleTransaction(party, account, amount, currency, endToEndId, id);
+        return new SimpleTransaction(party, account, amount, currency, endToEndId, id, intermediaryAgents);
     }
 }

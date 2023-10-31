@@ -92,6 +92,21 @@ class MyApp {
                 .currency("EUR")                    // Currency code
                 .endToEndId("Transfer reference 2") // End to end identifier
                 .id("Optional identifier 2")        // Optional transaction identifier
+                .intermediaryAgent(Bank.simpleBankAccount() // Optional intermediary agent 1
+                        .name("BNP PARIBAS")                 // Optional name
+                        .otherId("12345")                    // Optional other identification
+                        .bic("BNPAFRPP")                     // Optional BIC
+                        .build())
+                .intermediaryAgent(Bank.simpleBankAccount() // Optional intermediary agent 2
+                        .name("BNP PARIBAS")                 // Optional name
+                        .otherId("67890")                    // Optional other identification
+                        .bic("BNPAFRPP")                     // Optional BIC
+                        .build())
+                .intermediaryAgent(Bank.simpleBankAccount() // Optional intermediary agent 3
+                        .name("BNP PARIBAS")                 // Optional name
+                        .otherId("00000")                    // Optional other identification
+                        .bic("BNPAFRPP")                     // Optional BIC
+                        .build())
                 .build();
 
         // Transfer
@@ -122,7 +137,7 @@ Output with formatting:
     <CstmrCdtTrfInitn>
         <GrpHdr>
             <MsgId>MYID</MsgId>
-            <CreDtTm>2023-10-25T09:47:05.187</CreDtTm>
+            <CreDtTm>2023-10-31T11:09:49.921</CreDtTm>
             <NbOfTxs>2</NbOfTxs>
             <CtrlSum>69.12</CtrlSum>
             <InitgPty>
@@ -140,7 +155,7 @@ Output with formatting:
                     <Cd>SEPA</Cd>
                 </SvcLvl>
             </PmtTpInf>
-            <ReqdExctnDt>2023-10-26</ReqdExctnDt>
+            <ReqdExctnDt>2023-11-01</ReqdExctnDt>
             <Dbtr>
                 <Nm>Debtor Name</Nm>
             </Dbtr>
@@ -190,6 +205,45 @@ Output with formatting:
                 <Amt>
                     <InstdAmt Ccy="EUR">56.78</InstdAmt>
                 </Amt>
+                <IntrmyAgt1>
+                    <FinInstnId>
+                        <BIC>BNPAFRPP</BIC>
+                    </FinInstnId>
+                </IntrmyAgt1>
+                <IntrmyAgt1Acct>
+                    <Id>
+                        <Othr>
+                            <Id>12345</Id>
+                        </Othr>
+                    </Id>
+                    <Nm>BNP PARIBAS</Nm>
+                </IntrmyAgt1Acct>
+                <IntrmyAgt2>
+                    <FinInstnId>
+                        <BIC>BNPAFRPP</BIC>
+                    </FinInstnId>
+                </IntrmyAgt2>
+                <IntrmyAgt2Acct>
+                    <Id>
+                        <Othr>
+                            <Id>67890</Id>
+                        </Othr>
+                    </Id>
+                    <Nm>BNP PARIBAS</Nm>
+                </IntrmyAgt2Acct>
+                <IntrmyAgt3>
+                    <FinInstnId>
+                        <BIC>BNPAFRPP</BIC>
+                    </FinInstnId>
+                </IntrmyAgt3>
+                <IntrmyAgt3Acct>
+                    <Id>
+                        <Othr>
+                            <Id>00000</Id>
+                        </Othr>
+                    </Id>
+                    <Nm>BNP PARIBAS</Nm>
+                </IntrmyAgt3Acct>
                 <CdtrAgt>
                     <FinInstnId>
                         <BIC>BDFEFRPP</BIC>
