@@ -118,6 +118,7 @@ class MyApp {
                 .creationDateTime(LocalDateTime.now())               // Optional message creation date and time, defaults to now
                 .requestedExecutionDate(LocalDate.now().plusDays(1)) // Optional requested execution date, defaults to tomorrow
                 .id("MYID")                                          // Optional identifier, defaults to creation date and time as yyyyMMddhhmmss
+                .chargeBearerCode(ChargeBearerType1Code.DEBT)        // optional charge bearer code defines who is bearing the charges of the transfer 
                 .build();
 
         // export to string
