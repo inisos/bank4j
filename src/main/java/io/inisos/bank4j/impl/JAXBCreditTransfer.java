@@ -169,6 +169,8 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         creditTransferTransactionInformation.setAmt(amountType);
         creditTransferTransactionInformation.setCdtr(partyIdentification(transaction.getParty().orElse(null)));
         creditTransferTransactionInformation.setCdtrAcct(cashAccount(transaction.getAccount()));
+        transaction.getChargeBearerCode().ifPresent(creditTransferTransactionInformation::setChrgBr);
+
         branchAndFinancialInstitutionIdentification(transaction.getAccount()).ifPresent(creditTransferTransactionInformation::setCdtrAgt);
         Iterator<BankAccount> intermediaryAgentsIterator = transaction.getIntermediaryAgents().iterator();
         if (intermediaryAgentsIterator.hasNext()) {
