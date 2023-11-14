@@ -3,6 +3,7 @@ package io.inisos.bank4j.impl;
 import io.inisos.bank4j.BankAccount;
 import io.inisos.bank4j.Party;
 import io.inisos.bank4j.TransactionBuilder;
+import io.inisos.bank4j.validator.constraints.Iso20022CharacterSet;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -14,7 +15,9 @@ public class SimpleTransactionBuilder implements TransactionBuilder {
     private BankAccount account;
     private BigDecimal amount;
     private Currency currency;
+    @Iso20022CharacterSet
     private String endToEndId;
+    @Iso20022CharacterSet
     private String id;
     private final List<BankAccount> intermediaryAgents = new ArrayList<>();
 
