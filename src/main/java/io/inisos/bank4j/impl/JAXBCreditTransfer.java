@@ -34,6 +34,7 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
     private final String id;
     private final LocalDateTime creationDateTime;
     private final LocalDate requestedExecutionDate;
+    private final ChargeBearerType1Code chargeBearerCode;
 
     private final DatatypeFactory datatypeFactory;
 
@@ -49,8 +50,9 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
      * @param id                     optional identifier, defaults to execution date and time
      * @param creationDateTime       optional message creation date and time, defaults to now
      * @param requestedExecutionDate optional requested execution date and time, defaults to tomorrow
+     * @param chargeBearerCode       optional charge bearer code defines who is bearing the charges of the transfer, by default it is set to 'SLEV' (Service Level)
      */
-    public JAXBCreditTransfer(String serviceLevelCode, Party debtor, BankAccount debtorAccount, Collection<Transaction> transactions, String id, LocalDateTime creationDateTime, LocalDate requestedExecutionDate) {
+    public JAXBCreditTransfer(String serviceLevelCode, Party debtor, BankAccount debtorAccount, Collection<Transaction> transactions, String id, LocalDateTime creationDateTime, LocalDate requestedExecutionDate, ChargeBearerType1Code chargeBearerCode) {
         this.serviceLevelCode = serviceLevelCode;
         this.debtor = debtor;
         this.debtorAccount = Objects.requireNonNull(debtorAccount, "Debtor account cannot be null");
@@ -58,6 +60,7 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         this.creationDateTime = Optional.ofNullable(creationDateTime).orElse(LocalDateTime.now());
         this.requestedExecutionDate = Optional.ofNullable(requestedExecutionDate).orElse(LocalDate.now().plusDays(1));
         this.id = Optional.ofNullable(id).orElseGet(() -> FORMAT_AS_ID.format(this.creationDateTime));
+        this.chargeBearerCode = Optional.ofNullable(chargeBearerCode).orElseGet(() -> ChargeBearerType1Code.SLEV);
 
         try {
             this.datatypeFactory = DatatypeFactory.newInstance();
@@ -125,7 +128,7 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
 
         paymentInstructionInformationSCT3.setReqdExctnDt(this.datatypeFactory.newXMLGregorianCalendar(DateTimeFormatter.ISO_LOCAL_DATE.format(requestedExecutionDate)));
 
-        paymentInstructionInformationSCT3.setChrgBr(ChargeBearerType1Code.SLEV);
+        paymentInstructionInformationSCT3.setChrgBr(this.chargeBearerCode);
 
         for (Transaction transaction : this.transactions) {
             paymentInstructionInformationSCT3.getCdtTrfTxInf().add(transaction(transaction));
@@ -166,6 +169,8 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         creditTransferTransactionInformation.setAmt(amountType);
         creditTransferTransactionInformation.setCdtr(partyIdentification(transaction.getParty().orElse(null)));
         creditTransferTransactionInformation.setCdtrAcct(cashAccount(transaction.getAccount()));
+        transaction.getChargeBearerCode().ifPresent(creditTransferTransactionInformation::setChrgBr);
+
         branchAndFinancialInstitutionIdentification(transaction.getAccount()).ifPresent(creditTransferTransactionInformation::setCdtrAgt);
         Iterator<BankAccount> intermediaryAgentsIterator = transaction.getIntermediaryAgents().iterator();
         if (intermediaryAgentsIterator.hasNext()) {

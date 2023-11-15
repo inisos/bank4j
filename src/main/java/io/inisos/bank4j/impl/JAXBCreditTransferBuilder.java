@@ -1,6 +1,7 @@
 package io.inisos.bank4j.impl;
 
 import io.inisos.bank4j.*;
+import iso.std.iso._20022.tech.xsd.pain_001_001.ChargeBearerType1Code;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ public class JAXBCreditTransferBuilder implements CreditTransferOperationBuilder
     private String id;
     private LocalDateTime creationDateTime;
     private LocalDate requestedExecutionDate;
+    private ChargeBearerType1Code chargeBearerCode;
 
     @Override
     public CreditTransferOperationBuilder serviceLevelCode(String serviceLevelCode) {
@@ -65,7 +67,13 @@ public class JAXBCreditTransferBuilder implements CreditTransferOperationBuilder
     }
 
     @Override
+    public CreditTransferOperationBuilder chargeBearerCode(ChargeBearerType1Code chargeBearerCode) {
+        this.chargeBearerCode = chargeBearerCode;
+        return this;
+    }
+
+    @Override
     public CreditTransferOperation build() {
-        return new JAXBCreditTransfer(serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate);
+        return new JAXBCreditTransfer(serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate, chargeBearerCode);
     }
 }
