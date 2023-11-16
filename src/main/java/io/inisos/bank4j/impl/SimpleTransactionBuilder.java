@@ -4,6 +4,7 @@ import io.inisos.bank4j.BankAccount;
 import io.inisos.bank4j.Party;
 import io.inisos.bank4j.TransactionBuilder;
 import io.inisos.bank4j.validator.constraints.Iso20022CharacterSet;
+import iso.std.iso._20022.tech.xsd.pain_001_001.ChargeBearerType1Code;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class SimpleTransactionBuilder implements TransactionBuilder {
     private String endToEndId;
     @Iso20022CharacterSet
     private String id;
+    private ChargeBearerType1Code chargeBearerCode;
     private final List<BankAccount> intermediaryAgents = new ArrayList<>();
 
     @Override
@@ -64,6 +66,12 @@ public class SimpleTransactionBuilder implements TransactionBuilder {
     }
 
     @Override
+    public TransactionBuilder chargeBearerCode(ChargeBearerType1Code chargeBearerCode) {
+        this.chargeBearerCode = chargeBearerCode;
+        return this;
+    }
+
+    @Override
     public TransactionBuilder intermediaryAgent(BankAccount intermediaryAgent) {
         this.intermediaryAgents.add(intermediaryAgent);
         return this;
@@ -71,6 +79,6 @@ public class SimpleTransactionBuilder implements TransactionBuilder {
 
     @Override
     public SimpleTransaction build() {
-        return new SimpleTransaction(party, account, amount, currency, endToEndId, id, intermediaryAgents);
+        return new SimpleTransaction(party, account, amount, currency, endToEndId, id, chargeBearerCode, intermediaryAgents);
     }
 }

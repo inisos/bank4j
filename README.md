@@ -17,7 +17,7 @@ Tested with [Qonto](https://qonto.com) bulk SEPA transfers.
 <dependency>
     <groupId>io.inisos.bank4j</groupId>
     <artifactId>bank4j</artifactId>
-    <version>2.2.0</version>
+    <version>2.4.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -75,10 +75,11 @@ class MyApp {
                         .iban("FR7630001007941234567890185") // IBAN
                         .bic("BDFEFRPP")                     // Optional BIC
                         .build())           
-                .amount("12.34")                    // Amount, converted to BigDecimal
-                .currency("EUR")                    // Currency code
-                .endToEndId("Transfer reference 1") // End to end identifier
-                .id("Optional identifier 1")        // Optional Transaction identifier
+                .amount("12.34")                                // Amount, converted to BigDecimal
+                .currency("EUR")                                // Currency code
+                .endToEndId("Transfer reference 1")             // End to end identifier
+                .id("Optional identifier 1")                    // Optional Transaction identifier
+                .chargeBearerCode(ChargeBearerType1Code.CRED)   // Optional charge bearer code defines who is bearing the charges of the transfer 
                 .build();
         Transaction transaction2 = Bank.simpleTransaction()
                 .party(Bank.simpleParty()           // Optional creditor identification
@@ -92,6 +93,7 @@ class MyApp {
                 .currency("EUR")                    // Currency code
                 .endToEndId("Transfer reference 2") // End to end identifier
                 .id("Optional identifier 2")        // Optional transaction identifier
+                .chargeBearerCode(ChargeBearerType1Code.DEBT)   // Optional charge bearer code defines who is bearing the charges of the transfer
                 .intermediaryAgent(Bank.simpleBankAccount() // Optional intermediary agent 1
                         .name("BNP PARIBAS")                 // Optional name
                         .otherId("12345")                    // Optional other identification
@@ -118,6 +120,7 @@ class MyApp {
                 .creationDateTime(LocalDateTime.now())               // Optional message creation date and time, defaults to now
                 .requestedExecutionDate(LocalDate.now().plusDays(1)) // Optional requested execution date, defaults to tomorrow
                 .id("MYID")                                          // Optional identifier, defaults to creation date and time as yyyyMMddhhmmss
+                .chargeBearerCode(ChargeBearerType1Code.DEBT)        // Optional charge bearer code defines who is bearing the charges of the transfer 
                 .build();
 
         // export to string
