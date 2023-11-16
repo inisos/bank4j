@@ -1,6 +1,6 @@
 package io.inisos.bank4j.validator.constraints;
 
-import io.inisos.bank4j.validator.constraintvalidators.BICValidator;
+import io.inisos.bank4j.validator.constraintvalidators.Iso20022CharacterSetValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -10,7 +10,7 @@ import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Documented
-@Constraint(validatedBy = BICValidator.class)
+@Constraint(validatedBy = Iso20022CharacterSetValidator.class)
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 public @interface Iso20022CharacterSet {
