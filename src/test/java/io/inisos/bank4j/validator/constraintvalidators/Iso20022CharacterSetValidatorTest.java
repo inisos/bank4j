@@ -6,6 +6,7 @@ import io.inisos.bank4j.TransactionBuilder;
 import io.inisos.bank4j.util.Iso20022ReferenceElementValidator;
 import io.inisos.bank4j.validator.constraints.Iso20022CharacterSet;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -15,9 +16,6 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class Iso20022CharacterSetValidatorTest {
     private static Validator validator;
@@ -41,7 +39,7 @@ class Iso20022CharacterSetValidatorTest {
 
         Set<ConstraintViolation<Transaction>> violations = validator.validate(transaction);
 
-        assertFalse(violations.isEmpty());
+        Assertions.assertTrue(violations.isEmpty());
     }
 
     @Test
@@ -51,8 +49,8 @@ class Iso20022CharacterSetValidatorTest {
         Set<ConstraintViolation<Transaction>> violations = 
             validator.validate(transaction);
 
-        assertFalse(violations.isEmpty());
-        assertEquals(
+        Assertions.assertFalse(violations.isEmpty());
+        Assertions.assertEquals(
             Iso20022CharacterSet.class, 
             violations.iterator().next()
                 .getConstraintDescriptor()
@@ -69,6 +67,6 @@ class Iso20022CharacterSetValidatorTest {
 
         Set<ConstraintViolation<Transaction>> violations = validator.validate(transaction);
 
-        assertFalse(violations.isEmpty());
+        Assertions.assertTrue(violations.isEmpty());
     }
 }

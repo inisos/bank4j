@@ -58,7 +58,7 @@ public class Iso20022ReferenceElementValidator {
             sanitizedInput.append(
                 ISO20022_VALID_CHARS_PATTERN.matcher(String.valueOf(c)).find()
                     ? c
-                    : replacements.getOrDefault(c, DEFAULT_INVALID_CHAR_REPLACEMENT)
+                    : replacements.getOrDefault(c, DEFAULT_INVALID_CHAR_REPLACEMENT).charValue()
             );
         }
 

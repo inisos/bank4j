@@ -10,6 +10,10 @@ public class Iso20022CharacterSetValidator implements ConstraintValidator<Iso200
     
     @Override
     public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
+        if (value == null) {
+            return true;
+        }
+        
         return Iso20022ReferenceElementValidator.isValidCharacterSet(value);
     }
 }
