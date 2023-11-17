@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 public class Iso20022ReferenceElementValidator {
     private static final Pattern ISO20022_VALID_CHARS_PATTERN = Pattern.compile("^[A-Za-z0-9()+,./:\\s-]+$");
-    private static final Pattern ISO20022_INVALID_START_OR_END_PATTERN = Pattern.compile("^(?:[/\\s]|[//\\s])$");
+    private static final Pattern ISO20022_INVALID_START_OR_END_PATTERN = Pattern.compile("^[\\s/]+|[\\s/]+$");
     private static final String ISO20022_INVALID_POSITION = "//";
     private static final Pattern ISO20022_INVALID_POSITION_PATTERN = Pattern.compile(ISO20022_INVALID_POSITION);
     private static final char DEFAULT_INVALID_CHAR_REPLACEMENT = '.';
@@ -22,7 +22,7 @@ public class Iso20022ReferenceElementValidator {
     private Iso20022ReferenceElementValidator() {
         // private constructor to prevent class instantiation
     }
-    
+
     /**
      * Checks if a given input string is valid according to ISO20022 reference elements character set rules.
      *
