@@ -15,8 +15,21 @@ class Iso20022ReferenceElementValidatorTest {
     }
     
     @Test
-    void test_characterset_with_invalid_input() {
-        String invalidInput = "/ABC#DEF1234";
+    void test_characterset_with_invalid_content() {
+        assertThatInputIsNotValid("ABC#DEF1234");
+    }
+
+    @Test
+    void test_characterset_with_invalid_start() {
+        assertThatInputIsNotValid("/ABCDEF1234");
+    }
+
+    @Test
+    void test_characterset_with_invalid_end() {
+        assertThatInputIsNotValid("ABCDEF1234/");
+    }
+
+    private void assertThatInputIsNotValid(String invalidInput) {
         Assertions.assertFalse(Iso20022ReferenceElementValidator.isValidCharacterSet(invalidInput));
     }
     
