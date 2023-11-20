@@ -4,7 +4,7 @@
 
 Easily generate XML Credit Transfers based on [ISO 20022](https://www.iso20022.org/) Payments Initiation `pain.001.001.03`.
 
-Provides IBAN and BIC validation with annotations.
+Provides IBAN, BIC and Character set (for reference elements) validation with annotations.
 
 Written in Java 8 using JAXB and [iban4j](https://github.com/arturmkrtchyan/iban4j).
 
@@ -268,6 +268,33 @@ Output with formatting:
 </Document>
 ```
 
-## Interfaces
+## Go further
+
+### Using the `Iso20022ReferenceElementValidator` class
+The `Iso20022ReferenceElementValidator` class provides methods for validating and processing reference elements according to ISO 20022 standards.
+
+By default, these reference fields are validated with an annotation.
+
+#### Sanitization of reference elements
+If you can't anticipate the value for these reference fields and the validation doesn't pass, you can use this class we provide to automatically sanitize your fields using the `sanitizeToCharacterSet` method :
+
+```java
+String input = "/endTo#EndId";
+Map<Character, Character> customReplacements = new HashMap<>();
+customReplacements.put('#', '-'); // will replace all "#" chars with "-"
+
+Iso20022ReferenceElementValidator.sanitizeToCharacterSet(input, customReplacements);
+// Display "endTo-EndId"
+```
+_Note: the mapping for replacements (`customRemplacements`) is optional, we offer a default replacement (`.`) by default._
+
+#### Input validation
+The `isValidCharacterSet` method checks whether a string respects the valid characters defined by the ISO 20022 standard. It returns a boolean. Here's an example:
+
+```java
+Iso20022ReferenceElementValidator.isValidCharacterSet("ABCDEF1234"); // true
+```
+
+### Interfaces
 
 You can use your own implementations of `Transaction` and `BankAccount` but simple defaults are provided.

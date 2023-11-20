@@ -3,6 +3,7 @@ package io.inisos.bank4j.impl;
 import io.inisos.bank4j.BankAccount;
 import io.inisos.bank4j.Party;
 import io.inisos.bank4j.Transaction;
+import io.inisos.bank4j.validator.constraints.Iso20022CharacterSet;
 import iso.std.iso._20022.tech.xsd.pain_001_001.ChargeBearerType1Code;
 
 import java.math.BigDecimal;
@@ -19,7 +20,9 @@ public class SimpleTransaction implements Transaction {
     private final BankAccount account;
     private final BigDecimal amount;
     private final Currency currency;
+    @Iso20022CharacterSet
     private final String endToEndId;
+    @Iso20022CharacterSet
     private final String id;
     private final ChargeBearerType1Code chargeBearerCode;
     private final List<BankAccount> intermediaryAgents;
