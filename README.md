@@ -12,8 +12,17 @@ Tested with [Qonto](https://qonto.com) bulk SEPA transfers.
 
 ## Installation
 
-```xml
+### Requirements
 
+Java 8+
+
+For validation, you need to provide a Jakarta Bean Validation implementation (e.g. [Hibernate Validator](https://hibernate.org/validator/)).
+
+### Full installation
+
+Bundles API, JAXB2 implementation, validation based on Jakarta Bean Validation 2 and a simple data model with builders.
+
+```xml
 <dependency>
     <groupId>io.inisos.bank4j</groupId>
     <artifactId>bank4j</artifactId>
@@ -21,9 +30,84 @@ Tested with [Qonto](https://qonto.com) bulk SEPA transfers.
 </dependency>
 ```
 
+In the future, this artifact may switch to latest versions (JAXB 3+, Jakarta Bean Validation 3+, etc.).
+
+### Custom installation
+
+#### API
+
+```xml
+
+<dependencies>
+    <dependency>
+        <groupId>io.inisos.bank4j</groupId>
+        <artifactId>bank4j-api</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+    </dependency>
+    <!-- if you want validation, provide your Jakarta Bean Validation implementation,
+         e.g. Hibernate Validator -->
+    <dependency>
+        <groupId>org.hibernate.validator</groupId>
+        <artifactId>hibernate-validator</artifactId>
+        <version>6.2.5.Final</version>
+    </dependency>
+</dependencies>
+```
+
+#### XML message generation using JAXB 2
+
+Depends on `javax.xml.bind` package.
+
+```xml
+
+<dependency>
+    <groupId>io.inisos.bank4j</groupId>
+    <artifactId>bank4j-jaxb2</artifactId>
+    <version>3.0.0-SNAPSHOT</version>
+</dependency>
+```
+
+Glassfish `jaxb-runtime` implementation is a transitive dependency with runtime scope. Feel free to exclude it if you already use another implementation.
+
+#### Simple data model with builders
+
+You can use your own implementations, but simple defaults are provided for convenience.
+
+```xml
+
+<dependency>
+    <groupId>io.inisos.bank4j</groupId>
+    <artifactId>bank4j-simple</artifactId>
+    <version>3.0.0-SNAPSHOT</version>
+</dependency>
+```
+
+#### Validation based on Jakarta Bean Validation 2.x
+
+Depends on `javax.validation` package.
+
+```xml
+
+<dependencies>
+    <dependency>
+        <groupId>io.inisos.bank4j</groupId>
+        <artifactId>bank4j-validation2</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+    </dependency>
+    <!-- your Jakarta Bean Validation implementation, e.g. Hibernate Validator -->
+    <dependency>
+        <groupId>org.hibernate.validator</groupId>
+        <artifactId>hibernate-validator</artifactId>
+        <version>6.2.5.Final</version>
+    </dependency>
+</dependencies>
+```
+
 ## Usage
 
 ### IBAN and BIC validation
+
+Provided by bank4j-validation*
 
 ```java
 class MyRecord {
@@ -39,7 +123,7 @@ class MyRecord {
 
 Only accepts valid IBAN, BIC8 and BIC11.
 
-### Bulk SEPA transfers
+### XML message (pain) generation
 
 Simply provide bank account details and transactions:
 
@@ -264,7 +348,3 @@ Output with formatting:
     </CstmrCdtTrfInitn>
 </Document>
 ```
-
-## Interfaces
-
-You can use your own implementations of `Transaction` and `BankAccount` but simple defaults are provided.
