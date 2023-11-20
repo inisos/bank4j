@@ -1,12 +1,10 @@
-package io.inisos.bank4j;
-
-import java.util.HashMap;
-import java.util.Map;
+package io.inisos.bank4j.util;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.inisos.bank4j.util.Iso20022ReferenceElementValidator;
+import java.util.HashMap;
+import java.util.Map;
 
 class Iso20022ReferenceElementValidatorTest {
     
