@@ -23,7 +23,7 @@ Tested with [Qonto](https://qonto.com) bulk SEPA transfers.
 
 ## Usage
 
-### IBAN and BIC validation
+### Validation
 
 ```java
 class MyRecord {
@@ -34,10 +34,13 @@ class MyRecord {
     @BIC
     private String bic;
     
+    @Iso20022CharacterSet
+    private String reference;
+    
 }
 ```
 
-Only accepts valid IBAN, BIC8 and BIC11.
+Only accepts valid IBAN, BIC8/BIC11 and valid ISO 20022 patterns.
 
 ### Bulk SEPA transfers
 
