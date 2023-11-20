@@ -56,14 +56,14 @@ public class Iso20022ReferenceElementValidator {
      */
     public static String sanitizeToCharacterSet(String input, Map<Character, Character> replacements) {
         StringBuilder sanitizedInput = new StringBuilder();
-        char[] chars = input.toCharArray();
+        char[] inputChars = input.toCharArray();
 
-        for (char c : chars) {
-            sanitizedInput.append(
-                ISO20022_VALID_CHARS_PATTERN.matcher(String.valueOf(c)).find()
-                    ? c
-                    : replacements.getOrDefault(c, DEFAULT_INVALID_CHAR_REPLACEMENT).charValue()
-            );
+        char sanitizedChar;
+        for (char inputChar : inputChars) {
+            sanitizedChar = ISO20022_VALID_CHARS_PATTERN.matcher(String.valueOf(inputChar)).find()
+                    ? inputChar
+                    : replacements.getOrDefault(inputChar, DEFAULT_INVALID_CHAR_REPLACEMENT);
+            sanitizedInput.append(sanitizedChar);
         }
 
         String result = sanitizedInput.toString();
