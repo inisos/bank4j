@@ -30,6 +30,12 @@
             <artifactId>bank4j-api</artifactId>
         </dependency>
 
+        <!-- bank4j-util -->
+        <dependency>
+            <groupId>io.inisos.bank4j</groupId>
+            <artifactId>bank4j-util</artifactId>
+        </dependency>
+
         <!-- iban4j -->
         <dependency>
             <groupId>org.iban4j</groupId>

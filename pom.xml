@@ -63,6 +63,7 @@
         <module>bank4j-api</module>
         <module>bank4j-jaxb2</module>
         <module>bank4j-simple</module>
+        <module>bank4j-util</module>
         <module>bank4j-validation2</module>
     </modules>
 
@@ -74,6 +75,13 @@
             <dependency>
                 <groupId>io.inisos.bank4j</groupId>
                 <artifactId>bank4j-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- bank4j-util -->
+            <dependency>
+                <groupId>io.inisos.bank4j</groupId>
+                <artifactId>bank4j-util</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

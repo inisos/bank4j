@@ -9,11 +9,11 @@
         <version>3.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>bank4j-validation2</artifactId>
+    <artifactId>bank4j-util</artifactId>
     <packaging>jar</packaging>
 
-    <name>bank4j validation 2</name>
-    <description>Provides IBAN and BIC validation with Jakarta Bean Validation API 2</description>
+    <name>bank4j util</name>
+    <description>Utilities</description>
 
     <distributionManagement>
         <snapshotRepository>
@@ -22,51 +22,7 @@
         </snapshotRepository>
     </distributionManagement>
 
-    <properties>
-
-        <!-- Dependency versions -->
-        <jakarta-validation-api.version>2.0.2</jakarta-validation-api.version>
-
-        <!-- Test Dependency versions -->
-        <hibernate-validator.version>6.2.5.Final</hibernate-validator.version>
-        <jakarta-el.version>3.0.4</jakarta-el.version>
-
-    </properties>
-
     <dependencies>
-
-        <!-- bank4j util -->
-        <dependency>
-            <groupId>io.inisos.bank4j</groupId>
-            <artifactId>bank4j-util</artifactId>
-        </dependency>
-
-        <!-- iban4j -->
-        <dependency>
-            <groupId>org.iban4j</groupId>
-            <artifactId>iban4j</artifactId>
-        </dependency>
-
-        <!-- Validation API -->
-        <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
-            <version>${jakarta-validation-api.version}</version>
-        </dependency>
-
-        <!-- Hibernate Validator -->
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator-cdi</artifactId>
-            <version>${hibernate-validator.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.el</artifactId>
-            <version>${jakarta-el.version}</version>
-            <scope>test</scope>
-        </dependency>
 
         <!-- JUnit -->
         <dependency>
@@ -79,6 +35,7 @@
 
     <build>
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

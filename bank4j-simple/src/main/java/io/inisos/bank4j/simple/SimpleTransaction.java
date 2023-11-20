@@ -3,6 +3,7 @@ package io.inisos.bank4j.simple;
 import io.inisos.bank4j.BankAccount;
 import io.inisos.bank4j.Party;
 import io.inisos.bank4j.Transaction;
+import io.inisos.bank4j.util.Iso20022ReferenceElementValidator;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -27,12 +28,25 @@ public class SimpleTransaction implements Transaction {
         this.account = Objects.requireNonNull(account, "Account cannot be null");
         this.amount = Objects.requireNonNull(amount, "Amount cannot be null");
         this.currency = Objects.requireNonNull(currency, "Currency cannot be null");
-        this.endToEndId = Objects.requireNonNull(endToEndId, "End to end id cannot be null");
-        this.id = id;
+        this.endToEndId = requireValidFormat(
+                Objects.requireNonNull(endToEndId, "End to end id cannot be null"),
+                "EndToEndId does not comply with ISO 20022 formatting constraints");
+        if (id == null) {
+            this.id = null;
+        } else {
+            this.id = requireValidFormat(id, "Id does not comply with ISO 20022 formatting constraints");
+        }
         this.intermediaryAgents = Optional.ofNullable(intermediaryAgents).orElse(Collections.emptyList());
         if (this.intermediaryAgents.size() > 3) {
             throw new IllegalArgumentException("Intermediary agents cannot be more than 3");
         }
+    }
+
+    private String requireValidFormat(String input, String message) {
+        if (!Iso20022ReferenceElementValidator.isValidCharacterSet(input)) {
+            throw new IllegalArgumentException(message);
+        }
+        return input;
     }
 
     @Override
