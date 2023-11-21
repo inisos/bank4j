@@ -6,7 +6,7 @@
 
     <groupId>io.inisos.bank4j</groupId>
     <artifactId>bank4j</artifactId>
-    <version>2.5.0</version>
+    <version>3.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>bank4j</name>
@@ -40,23 +40,21 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <java.version>11</java.version>
 
         <!-- Dependency versions -->
         <iban4j.version>3.2.7-RELEASE</iban4j.version>
-        <jakarta-validation-api.version>2.0.2</jakarta-validation-api.version>
-        <jakarta-xml-bind-api.version>2.3.3</jakarta-xml-bind-api.version>
-        <jaxb-runtime.version>2.3.8</jaxb-runtime.version>
+        <jakarta-validation-api.version>3.0.2</jakarta-validation-api.version>
+        <jakarta-xml-bind-api.version>4.0.0</jakarta-xml-bind-api.version>
+        <jaxb-runtime.version>4.0.2</jaxb-runtime.version>
 
         <!-- Test Dependency versions -->
-        <hibernate-validator.version>6.2.5.Final</hibernate-validator.version>
-        <jakarta-el.version>3.0.4</jakarta-el.version>
+        <hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
+        <expressly.version>5.0.0</expressly.version>
         <junit.version>5.9.2</junit.version>
 
         <!-- Plugin versions -->
-        <jaxb2-maven-plugin.version>2.5.0</jaxb2-maven-plugin.version>
+        <jaxb30-maven-plugin.version>0.15.0</jaxb30-maven-plugin.version>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <maven-javadoc-plugin.version>3.6.0</maven-javadoc-plugin.version>
@@ -103,9 +101,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.el</artifactId>
-            <version>${jakarta-el.version}</version>
+            <groupId>org.glassfish.expressly</groupId>
+            <artifactId>expressly</artifactId>
+            <version>${expressly.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -185,21 +183,21 @@
             </plugin>
 
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>${jaxb2-maven-plugin.version}</version>
+                <groupId>com.evolvedbinary.maven.jvnet</groupId>
+                <artifactId>jaxb30-maven-plugin</artifactId>
+                <version>${jaxb30-maven-plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>xjc</id>
                         <goals>
-                            <goal>xjc</goal>
+                            <goal>generate</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <sources>
-                        <source>src/main/resources/pain.001.001.03.xsd</source>
-                    </sources>
+                    <schemaDirectory>src/main/resources</schemaDirectory>
+                    <schemaIncludes>
+                        <include>*.xsd</include>
+                    </schemaIncludes>
                 </configuration>
             </plugin>
 

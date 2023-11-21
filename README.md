@@ -6,7 +6,7 @@ Easily generate XML Credit Transfers based on [ISO 20022](https://www.iso20022.o
 
 Provides IBAN, BIC and Character set (for reference elements) validation with annotations.
 
-Written in Java 8 using JAXB and [iban4j](https://github.com/arturmkrtchyan/iban4j).
+Using JAXB and [iban4j](https://github.com/arturmkrtchyan/iban4j).
 
 Tested with [Qonto](https://qonto.com) bulk SEPA transfers.
 
@@ -17,7 +17,7 @@ Tested with [Qonto](https://qonto.com) bulk SEPA transfers.
 <dependency>
     <groupId>io.inisos.bank4j</groupId>
     <artifactId>bank4j</artifactId>
-    <version>2.5.0</version>
+    <version>3.0.0</version>
 </dependency>
 ```
 

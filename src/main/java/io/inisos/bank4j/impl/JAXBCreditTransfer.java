@@ -2,13 +2,13 @@ package io.inisos.bank4j.impl;
 
 import io.inisos.bank4j.*;
 import iso.std.iso._20022.tech.xsd.pain_001_001.*;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import org.iban4j.BicUtil;
 import org.iban4j.IbanUtil;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.namespace.QName;
@@ -118,7 +118,7 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         paymentInstructionInformationSCT3.setDbtrAcct(cashAccount(this.debtorAccount));
         branchAndFinancialInstitutionIdentification(this.debtorAccount).ifPresent(paymentInstructionInformationSCT3::setDbtrAgt);
 
-        if(this.serviceLevelCode != null) {
+        if (this.serviceLevelCode != null) {
             ServiceLevel8Choice serviceLevel = new ServiceLevel8Choice();
             serviceLevel.setCd(this.serviceLevelCode);
             PaymentTypeInformation19 paymentTypeInformation = new PaymentTypeInformation19();

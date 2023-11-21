@@ -1,11 +1,10 @@
 package io.inisos.bank4j.validator.constraintvalidators;
 
 import io.inisos.bank4j.validator.constraints.BIC;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import org.iban4j.BicUtil;
 import org.iban4j.Iban4jException;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
 public class BICValidator implements ConstraintValidator<BIC, String> {
 

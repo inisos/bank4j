@@ -3,15 +3,13 @@ package io.inisos.bank4j.validator.constraintvalidators;
 import io.inisos.bank4j.Bank;
 import io.inisos.bank4j.Transaction;
 import io.inisos.bank4j.TransactionBuilder;
-
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 
 import java.util.Collections;
 import java.util.Set;

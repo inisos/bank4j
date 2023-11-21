@@ -2,13 +2,12 @@ package io.inisos.bank4j.validator.constraintvalidators;
 
 import io.inisos.bank4j.BankAccount;
 import io.inisos.bank4j.impl.SimpleBankAccountBuilder;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 
 import java.util.Locale;
 import java.util.Set;

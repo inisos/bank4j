@@ -1,11 +1,10 @@
 package io.inisos.bank4j.validator.constraintvalidators;
 
 import io.inisos.bank4j.validator.constraints.IBAN;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import org.iban4j.Iban4jException;
 import org.iban4j.IbanUtil;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
 public class IBANValidator implements ConstraintValidator<IBAN, String> {
 
