@@ -9,6 +9,9 @@ import iso.std.iso._20022.tech.xsd.pain_001_001.ChargeBearerType1Code;
 import java.math.BigDecimal;
 import java.util.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Size;
+
 /**
  * Simple Transaction
  *
@@ -26,8 +29,9 @@ public class SimpleTransaction implements Transaction {
     private final String id;
     private final ChargeBearerType1Code chargeBearerCode;
     private final List<BankAccount> intermediaryAgents;
+    private final Set<@Valid @Size(max = 140) String> remittanceInformationUnstructured;
 
-    public SimpleTransaction(Party party, BankAccount account, BigDecimal amount, Currency currency, String endToEndId, String id, ChargeBearerType1Code chargeBearerCode, List<BankAccount> intermediaryAgents) {
+    public SimpleTransaction(Party party, BankAccount account, BigDecimal amount, Currency currency, String endToEndId, String id, ChargeBearerType1Code chargeBearerCode, List<BankAccount> intermediaryAgents, Set<String> remittanceInformationUnstructured) {
         this.party = party;
         this.account = Objects.requireNonNull(account, "Account cannot be null");
         this.amount = Objects.requireNonNull(amount, "Amount cannot be null");
@@ -36,6 +40,7 @@ public class SimpleTransaction implements Transaction {
         this.id = id;
         this.chargeBearerCode = chargeBearerCode;
         this.intermediaryAgents = Optional.ofNullable(intermediaryAgents).orElse(Collections.emptyList());
+        this.remittanceInformationUnstructured = Optional.ofNullable(remittanceInformationUnstructured).orElse(Collections.emptySet());
         if (this.intermediaryAgents.size() > 3) {
             throw new IllegalArgumentException("Intermediary agents cannot be more than 3");
         }
@@ -82,16 +87,21 @@ public class SimpleTransaction implements Transaction {
     }
 
     @Override
+    public Set<String> getRemittanceInformationUnstructured() {
+        return remittanceInformationUnstructured;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SimpleTransaction)) return false;
         SimpleTransaction that = (SimpleTransaction) o;
-        return getParty().equals(that.getParty()) && getAccount().equals(that.getAccount()) && getAmount().equals(that.getAmount()) && currency.equals(that.currency) && getEndToEndId().equals(that.getEndToEndId()) && Objects.equals(getId(), that.getId());
+        return getParty().equals(that.getParty()) && getAccount().equals(that.getAccount()) && getAmount().equals(that.getAmount()) && currency.equals(that.currency) && getEndToEndId().equals(that.getEndToEndId()) && Objects.equals(getId(), that.getId()) && getChargeBearerCode().equals(that.getChargeBearerCode()) && getIntermediaryAgents().equals(that.getIntermediaryAgents()) && getRemittanceInformationUnstructured().equals(that.getRemittanceInformationUnstructured());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getParty(), getAccount(), getAmount(), currency, getEndToEndId(), getId());
+        return Objects.hash(getParty(), getAccount(), getAmount(), currency, getEndToEndId(), getId(), getChargeBearerCode(), getIntermediaryAgents(), getRemittanceInformationUnstructured());
     }
 
     @Override
@@ -103,6 +113,9 @@ public class SimpleTransaction implements Transaction {
                 .add("currency=" + currency)
                 .add("endToEndId='" + endToEndId + "'")
                 .add("id='" + id + "'")
+                .add("chargeBearerCode=" + chargeBearerCode)
+                .add("intermediaryAgents=" + intermediaryAgents)
+                .add("remittanceInformationUnstructured=" + getRemittanceInformationUnstructured())
                 .toString();
     }
 }

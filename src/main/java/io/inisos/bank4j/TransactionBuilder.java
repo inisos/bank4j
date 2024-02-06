@@ -3,6 +3,7 @@ package io.inisos.bank4j;
 import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.List;
+import java.util.Set;
 
 import iso.std.iso._20022.tech.xsd.pain_001_001.ChargeBearerType1Code;
 
@@ -45,6 +46,8 @@ public interface TransactionBuilder {
     TransactionBuilder intermediaryAgents(List<BankAccount> intermediaryAgents);
 
     TransactionBuilder intermediaryAgent(BankAccount intermediaryAgent);
+
+    TransactionBuilder remittanceInformationUnstructured(Set<String> remittanceInformationUnstructured);
 
     Transaction build();
 }
