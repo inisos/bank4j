@@ -83,6 +83,7 @@ class MyApp {
                 .endToEndId("Transfer reference 1")             // End to end identifier
                 .id("Optional identifier 1")                    // Optional Transaction identifier
                 .chargeBearerCode(ChargeBearerType1Code.CRED)   // Optional charge bearer code defines who is bearing the charges of the transfer 
+                .remittanceInformationUnstructured("Your remittance information")   // Unstructured Remittance Information 
                 .build();
         Transaction transaction2 = Bank.simpleTransaction()
                 .party(Bank.simpleParty()           // Optional creditor identification
