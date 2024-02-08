@@ -266,6 +266,9 @@ Output with formatting:
                         </Othr>
                     </Id>
                 </CdtrAcct>
+                <RmtInf>
+                    <Ustrd>Your remittance information</Ustrd>
+                </RmtInf>
             </CdtTrfTxInf>
         </PmtInf>
     </CstmrCdtTrfInitn>
