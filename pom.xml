@@ -6,7 +6,7 @@
 
     <groupId>io.inisos.bank4j</groupId>
     <artifactId>bank4j</artifactId>
-    <version>2.5.0</version>
+    <version>3.0.0</version>
     <packaging>jar</packaging>
 
     <name>bank4j</name>
@@ -39,30 +39,31 @@
     </distributionManagement>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
+        <java.version>21</java.version>
+        <project.encoding>UTF-8</project.encoding>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
+        <project.build.sourceEncoding>${project.encoding}</project.build.sourceEncoding>
 
         <!-- Dependency versions -->
-        <iban4j.version>3.2.7-RELEASE</iban4j.version>
-        <jakarta-validation-api.version>2.0.2</jakarta-validation-api.version>
-        <jakarta-xml-bind-api.version>2.3.3</jakarta-xml-bind-api.version>
-        <jaxb-runtime.version>2.3.8</jaxb-runtime.version>
+        <iban4j.version>3.2.9-RELEASE</iban4j.version>
+        <jakarta-validation-api.version>3.1.0</jakarta-validation-api.version>
+        <jakarta-xml-bind-api.version>4.0.2</jakarta-xml-bind-api.version>
+        <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
 
         <!-- Test Dependency versions -->
-        <hibernate-validator.version>6.2.5.Final</hibernate-validator.version>
-        <jakarta-el.version>3.0.4</jakarta-el.version>
-        <junit.version>5.9.2</junit.version>
+        <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
+        <jakarta-el.version>5.0.0-M1</jakarta-el.version>
+        <junit.version>5.11.0-M2</junit.version>
 
         <!-- Plugin versions -->
-        <jaxb2-maven-plugin.version>2.5.0</jaxb2-maven-plugin.version>
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-        <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
-        <maven-javadoc-plugin.version>3.6.0</maven-javadoc-plugin.version>
-        <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
-        <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
-        <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
+        <jaxb2-maven-plugin.version>3.2.0</jaxb2-maven-plugin.version>
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-gpg-plugin.version>3.2.4</maven-gpg-plugin.version>
+        <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
+        <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
+        <nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
 
     </properties>
 

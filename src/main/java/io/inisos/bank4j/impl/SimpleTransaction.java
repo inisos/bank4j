@@ -5,12 +5,12 @@ import io.inisos.bank4j.Party;
 import io.inisos.bank4j.Transaction;
 import io.inisos.bank4j.validator.constraints.Iso20022CharacterSet;
 import iso.std.iso._20022.tech.xsd.pain_001_001.ChargeBearerType1Code;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.util.*;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 
 /**
  * Simple Transaction

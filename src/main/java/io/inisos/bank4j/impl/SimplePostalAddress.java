@@ -2,8 +2,8 @@ package io.inisos.bank4j.impl;
 
 
 import io.inisos.bank4j.PostalAddress;
+import jakarta.validation.constraints.Size;
 
-import javax.validation.constraints.Size;
 import java.util.*;
 
 public class SimplePostalAddress implements PostalAddress {

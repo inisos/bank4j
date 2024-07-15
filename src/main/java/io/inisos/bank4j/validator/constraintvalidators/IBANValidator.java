@@ -4,8 +4,8 @@ import io.inisos.bank4j.validator.constraints.IBAN;
 import org.iban4j.Iban4jException;
 import org.iban4j.IbanUtil;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class IBANValidator implements ConstraintValidator<IBAN, String> {
 
