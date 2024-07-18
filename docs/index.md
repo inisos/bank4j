@@ -4,7 +4,7 @@ Easily generate XML Credit Transfers based on [ISO 20022](https://www.iso20022.o
 
 Provides IBAN and BIC validation with annotations.
 
-Written in Java 8 using JAXB and [iban4j](https://github.com/arturmkrtchyan/iban4j).
+Using JAXB and [iban4j](https://github.com/arturmkrtchyan/iban4j).
 
 ### Installation
 
@@ -13,13 +13,16 @@ Written in Java 8 using JAXB and [iban4j](https://github.com/arturmkrtchyan/iban
 <dependency>
     <groupId>io.inisos.bank4j</groupId>
     <artifactId>bank4j</artifactId>
-    <version>2.0.0</version>
+    <version>3.0.0</version>
 </dependency>
 ```
 
-### Usage
+* Use version 3 for `jarkarta.*` dependencies (Java 11, JAXB 3+, Bean Validation 3+)
+* Use version 2 for `javax.*` dependencies (Java 8, JAXB 2, Bean Validation 2)
 
-#### IBAN and BIC validation
+## Usage
+
+### Validation
 
 ```java
 class MyRecord {
@@ -30,19 +33,24 @@ class MyRecord {
     @BIC
     private String bic;
     
+    @Iso20022CharacterSet
+    private String reference;
+    
 }
 ```
 
-Only accepts valid IBAN, BIC8 and BIC11.
+Only accepts valid IBAN, BIC8/BIC11 and valid ISO 20022 patterns.
 
-#### Bulk SEPA transfers
+### Bulk SEPA transfers
 
 Simply provide bank account details and transactions:
 
 ```java
+import io.inisos.bank4j.Bank;
+
 class MyApp {
 
-    public static void main(String...args) {
+    public static void main(String... args) {
 
         // Optional debtor identification
         Party debtor = Bank.simpleParty()
@@ -55,38 +63,55 @@ class MyApp {
                 .bic("PSSTFRPP")                     // Optional BIC
                 .build();
 
-        // Optional creditor identification
-        Party creditor = Bank.simpleParty()
-                .name("Creditor Name")                    // Optional name
-                .postalAddress(Bank.simplePostalAddress() // Optional postal address
-                        .addressLine("1, rue de La Vrillière")
-                        .addressLine("75001 PARIS")
-                        .country("FR")
-                        .build())
-                .build();
-
-        // Creditor account
-        BankAccount creditorAccount = Bank.simpleBankAccount()
-                .iban("FR7630001007941234567890185") // IBAN
-                .bic("BDFEFRPP")                     // Optional BIC
-                .build();
-
         // Transactions
         Transaction transaction1 = Bank.simpleTransaction()
-                .party(creditor)                    // Optional creditor identification
-                .account(creditorAccount)           // Creditor account
-                .amount("12.34")                    // Amount, converted to BigDecimal
-                .currency("EUR")                    // Currency code
-                .endToEndId("Transfer reference 1") // End to end identifier
-                .id("Optional identifier 1")        // Optional Transaction identifier
+                .party(Bank.simpleParty()           // Optional creditor identification
+                        .name("BANQUE DE FRANCE")                 // Optional name
+                        .postalAddress(Bank.simplePostalAddress() // Optional postal address
+                                .addressLine("1, rue de La Vrillière")
+                                .addressLine("75001 PARIS")
+                                .country("FR")
+                                .build())
+                        .build())
+                .account(Bank.simpleBankAccount()   // Creditor account
+                        .iban("FR7630001007941234567890185") // IBAN
+                        .bic("BDFEFRPP")                     // Optional BIC
+                        .build())           
+                .amount("12.34")                                // Amount, converted to BigDecimal
+                .currency("EUR")                                // Currency code
+                .endToEndId("Transfer reference 1")             // End to end identifier
+                .id("Optional identifier 1")                    // Optional Transaction identifier
+                .chargeBearerCode(ChargeBearerType1Code.CRED)   // Optional charge bearer code defines who is bearing the charges of the transfer 
+                .remittanceInformationUnstructured("Your remittance information")   // Unstructured Remittance Information 
                 .build();
         Transaction transaction2 = Bank.simpleTransaction()
-                .party(creditor)                    // Optional creditor identification
-                .account(creditorAccount)           // Creditor account
+                .party(Bank.simpleParty()           // Optional creditor identification
+                        .name("Creditor Name")                    // Optional name
+                        .build())                    
+                .account(Bank.simpleBankAccount()   // Creditor account
+                        .otherId("1234567890")               // Other identification
+                        .bic("BDFEFRPP")                     // BIC
+                        .build())           // Creditor account
                 .amount(new BigDecimal("56.78"))    // Amount as BigDecimal
                 .currency("EUR")                    // Currency code
                 .endToEndId("Transfer reference 2") // End to end identifier
                 .id("Optional identifier 2")        // Optional transaction identifier
+                .chargeBearerCode(ChargeBearerType1Code.DEBT)   // Optional charge bearer code defines who is bearing the charges of the transfer
+                .intermediaryAgent(Bank.simpleBankAccount() // Optional intermediary agent 1
+                        .name("BNP PARIBAS")                 // Optional name
+                        .otherId("12345")                    // Optional other identification
+                        .bic("BNPAFRPP")                     // Optional BIC
+                        .build())
+                .intermediaryAgent(Bank.simpleBankAccount() // Optional intermediary agent 2
+                        .name("BNP PARIBAS")                 // Optional name
+                        .otherId("67890")                    // Optional other identification
+                        .bic("BNPAFRPP")                     // Optional BIC
+                        .build())
+                .intermediaryAgent(Bank.simpleBankAccount() // Optional intermediary agent 3
+                        .name("BNP PARIBAS")                 // Optional name
+                        .otherId("00000")                    // Optional other identification
+                        .bic("BNPAFRPP")                     // Optional BIC
+                        .build())
                 .build();
 
         // Transfer
@@ -98,6 +123,7 @@ class MyApp {
                 .creationDateTime(LocalDateTime.now())               // Optional message creation date and time, defaults to now
                 .requestedExecutionDate(LocalDate.now().plusDays(1)) // Optional requested execution date, defaults to tomorrow
                 .id("MYID")                                          // Optional identifier, defaults to creation date and time as yyyyMMddhhmmss
+                .chargeBearerCode(ChargeBearerType1Code.DEBT)        // Optional charge bearer code defines who is bearing the charges of the transfer 
                 .build();
 
         // export to string
@@ -117,7 +143,7 @@ Output with formatting:
     <CstmrCdtTrfInitn>
         <GrpHdr>
             <MsgId>MYID</MsgId>
-            <CreDtTm>2023-10-24T16:27:53.594</CreDtTm>
+            <CreDtTm>2023-10-31T11:09:49.921</CreDtTm>
             <NbOfTxs>2</NbOfTxs>
             <CtrlSum>69.12</CtrlSum>
             <InitgPty>
@@ -135,7 +161,7 @@ Output with formatting:
                     <Cd>SEPA</Cd>
                 </SvcLvl>
             </PmtTpInf>
-            <ReqdExctnDt>2023-10-25</ReqdExctnDt>
+            <ReqdExctnDt>2023-11-01</ReqdExctnDt>
             <Dbtr>
                 <Nm>Debtor Name</Nm>
             </Dbtr>
@@ -164,7 +190,7 @@ Output with formatting:
                     </FinInstnId>
                 </CdtrAgt>
                 <Cdtr>
-                    <Nm>Creditor Name</Nm>
+                    <Nm>BANQUE DE FRANCE</Nm>
                     <PstlAdr>
                         <Ctry>FR</Ctry>
                         <AdrLine>1, rue de La Vrillière</AdrLine>
@@ -185,6 +211,45 @@ Output with formatting:
                 <Amt>
                     <InstdAmt Ccy="EUR">56.78</InstdAmt>
                 </Amt>
+                <IntrmyAgt1>
+                    <FinInstnId>
+                        <BIC>BNPAFRPP</BIC>
+                    </FinInstnId>
+                </IntrmyAgt1>
+                <IntrmyAgt1Acct>
+                    <Id>
+                        <Othr>
+                            <Id>12345</Id>
+                        </Othr>
+                    </Id>
+                    <Nm>BNP PARIBAS</Nm>
+                </IntrmyAgt1Acct>
+                <IntrmyAgt2>
+                    <FinInstnId>
+                        <BIC>BNPAFRPP</BIC>
+                    </FinInstnId>
+                </IntrmyAgt2>
+                <IntrmyAgt2Acct>
+                    <Id>
+                        <Othr>
+                            <Id>67890</Id>
+                        </Othr>
+                    </Id>
+                    <Nm>BNP PARIBAS</Nm>
+                </IntrmyAgt2Acct>
+                <IntrmyAgt3>
+                    <FinInstnId>
+                        <BIC>BNPAFRPP</BIC>
+                    </FinInstnId>
+                </IntrmyAgt3>
+                <IntrmyAgt3Acct>
+                    <Id>
+                        <Othr>
+                            <Id>00000</Id>
+                        </Othr>
+                    </Id>
+                    <Nm>BNP PARIBAS</Nm>
+                </IntrmyAgt3Acct>
                 <CdtrAgt>
                     <FinInstnId>
                         <BIC>BDFEFRPP</BIC>
@@ -192,21 +257,48 @@ Output with formatting:
                 </CdtrAgt>
                 <Cdtr>
                     <Nm>Creditor Name</Nm>
-                    <PstlAdr>
-                        <Ctry>FR</Ctry>
-                        <AdrLine>1, rue de La Vrillière</AdrLine>
-                        <AdrLine>75001 PARIS</AdrLine>
-                    </PstlAdr>
                 </Cdtr>
                 <CdtrAcct>
                     <Id>
-                        <IBAN>FR7630001007941234567890185</IBAN>
+                        <Othr>
+                            <Id>1234567890</Id>
+                        </Othr>
                     </Id>
                 </CdtrAcct>
+                <RmtInf>
+                    <Ustrd>Your remittance information</Ustrd>
+                </RmtInf>
             </CdtTrfTxInf>
         </PmtInf>
     </CstmrCdtTrfInitn>
 </Document>
+```
+
+## Go further
+
+### Using the `Iso20022ReferenceElementValidator` class
+The `Iso20022ReferenceElementValidator` class provides methods for validating and processing reference elements according to ISO 20022 standards.
+
+By default, these reference fields are validated with an annotation.
+
+#### Sanitization of reference elements
+If you can't anticipate the value for these reference fields and the validation doesn't pass, you can use this class we provide to automatically sanitize your fields using the `sanitizeToCharacterSet` method :
+
+```java
+String input = "/endTo#EndId";
+Map<Character, Character> customReplacements = new HashMap<>();
+customReplacements.put('#', '-'); // will replace all "#" chars with "-"
+
+Iso20022ReferenceElementValidator.sanitizeToCharacterSet(input, customReplacements);
+// Display "endTo-EndId"
+```
+_Note: the mapping for replacements (`customRemplacements`) is optional, we offer a default replacement (`.`) by default._
+
+#### Input validation
+The `isValidCharacterSet` method checks whether a string respects the valid characters defined by the ISO 20022 standard. It returns a boolean. Here's an example:
+
+```java
+Iso20022ReferenceElementValidator.isValidCharacterSet("ABCDEF1234"); // true
 ```
 
 ### Interfaces
