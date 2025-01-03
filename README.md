@@ -21,6 +21,9 @@ Tested with [Qonto](https://qonto.com) bulk SEPA transfers.
 </dependency>
 ```
 
+* Use version 3 for `jarkarta.*` dependencies (Java 11, JAXB 3+, Bean Validation 3+)
+* Use version 2 for `javax.*` dependencies (Java 8, JAXB 2, Bean Validation 2)
+
 ## Usage
 
 ### Validation
