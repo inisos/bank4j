@@ -116,7 +116,7 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         paymentInstructionInformationSCT3.setCtrlSum(this.getTotalAmount());
         paymentInstructionInformationSCT3.setDbtr(partyIdentification(this.debtor));
         paymentInstructionInformationSCT3.setDbtrAcct(cashAccount(this.debtorAccount));
-        branchAndFinancialInstitutionIdentification(this.debtorAccount).ifPresent(paymentInstructionInformationSCT3::setDbtrAgt);
+        paymentInstructionInformationSCT3.setDbtrAgt(mandatoryBranchAndFinancialInstitutionIdentification(this.debtorAccount));
 
         if (this.serviceLevelCode != null) {
             ServiceLevel8Choice serviceLevel = new ServiceLevel8Choice();
@@ -179,28 +179,28 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
 
         transaction.getChargeBearerCode().ifPresent(creditTransferTransactionInformation::setChrgBr);
 
-        branchAndFinancialInstitutionIdentification(transaction.getAccount()).ifPresent(creditTransferTransactionInformation::setCdtrAgt);
+        optionalBranchAndFinancialInstitutionIdentificationOpt(transaction.getAccount()).ifPresent(creditTransferTransactionInformation::setCdtrAgt);
         Iterator<BankAccount> intermediaryAgentsIterator = transaction.getIntermediaryAgents().iterator();
         if (intermediaryAgentsIterator.hasNext()) {
             BankAccount first = intermediaryAgentsIterator.next();
             creditTransferTransactionInformation.setIntrmyAgt1Acct(cashAccount(first));
-            branchAndFinancialInstitutionIdentification(first).ifPresent(creditTransferTransactionInformation::setIntrmyAgt1);
+            optionalBranchAndFinancialInstitutionIdentificationOpt(first).ifPresent(creditTransferTransactionInformation::setIntrmyAgt1);
         }
         if (intermediaryAgentsIterator.hasNext()) {
             BankAccount second = intermediaryAgentsIterator.next();
             creditTransferTransactionInformation.setIntrmyAgt2Acct(cashAccount(second));
-            branchAndFinancialInstitutionIdentification(second).ifPresent(creditTransferTransactionInformation::setIntrmyAgt2);
+            optionalBranchAndFinancialInstitutionIdentificationOpt(second).ifPresent(creditTransferTransactionInformation::setIntrmyAgt2);
         }
         if (intermediaryAgentsIterator.hasNext()) {
             BankAccount third = intermediaryAgentsIterator.next();
             creditTransferTransactionInformation.setIntrmyAgt3Acct(cashAccount(third));
-            branchAndFinancialInstitutionIdentification(third).ifPresent(creditTransferTransactionInformation::setIntrmyAgt3);
+            optionalBranchAndFinancialInstitutionIdentificationOpt(third).ifPresent(creditTransferTransactionInformation::setIntrmyAgt3);
         }
 
         return creditTransferTransactionInformation;
     }
 
-    private Optional<BranchAndFinancialInstitutionIdentification4> branchAndFinancialInstitutionIdentification(BankAccount bankAccount) {
+    private Optional<BranchAndFinancialInstitutionIdentification4> optionalBranchAndFinancialInstitutionIdentificationOpt(BankAccount bankAccount) {
         return bankAccount.getBic().map(bic -> {
             BicUtil.validate(bic);
             FinancialInstitutionIdentification7 financialInstitutionIdentification = new FinancialInstitutionIdentification7();
@@ -209,6 +209,17 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
             branchAndFinancialInstitutionIdentification.setFinInstnId(financialInstitutionIdentification);
             return branchAndFinancialInstitutionIdentification;
         });
+    }
+
+    private BranchAndFinancialInstitutionIdentification4 mandatoryBranchAndFinancialInstitutionIdentification(BankAccount bankAccount) {
+        BranchAndFinancialInstitutionIdentification4 branchAndFinancialInstitutionIdentification = new BranchAndFinancialInstitutionIdentification4();
+        FinancialInstitutionIdentification7 financialInstitutionIdentification = new FinancialInstitutionIdentification7();
+        bankAccount.getBic().ifPresent(bic -> {
+            BicUtil.validate(bic);
+            financialInstitutionIdentification.setBIC(bic);
+        });
+        branchAndFinancialInstitutionIdentification.setFinInstnId(financialInstitutionIdentification);
+        return branchAndFinancialInstitutionIdentification;
     }
 
     private PartyIdentification32 partyIdentification(Party party) {
