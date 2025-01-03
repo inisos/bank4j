@@ -13,7 +13,7 @@ Using JAXB and [iban4j](https://github.com/arturmkrtchyan/iban4j).
 <dependency>
     <groupId>io.inisos.bank4j</groupId>
     <artifactId>bank4j</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
 </dependency>
 ```
 
