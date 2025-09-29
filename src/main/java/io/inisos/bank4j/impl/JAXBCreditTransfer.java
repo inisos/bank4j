@@ -35,6 +35,7 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
     private final LocalDateTime creationDateTime;
     private final LocalDate requestedExecutionDate;
     private final ChargeBearerType1Code chargeBearerCode;
+    private final boolean batchBooking;
 
     private final DatatypeFactory datatypeFactory;
 
@@ -52,7 +53,7 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
      * @param requestedExecutionDate optional requested execution date and time, defaults to tomorrow
      * @param chargeBearerCode       optional charge bearer code defines who is bearing the charges of the transfer, by default it is set to 'SLEV' (Service Level)
      */
-    public JAXBCreditTransfer(String serviceLevelCode, Party debtor, BankAccount debtorAccount, Collection<Transaction> transactions, String id, LocalDateTime creationDateTime, LocalDate requestedExecutionDate, ChargeBearerType1Code chargeBearerCode) {
+    public JAXBCreditTransfer(String serviceLevelCode, Party debtor, BankAccount debtorAccount, Collection<Transaction> transactions, String id, LocalDateTime creationDateTime, LocalDate requestedExecutionDate, ChargeBearerType1Code chargeBearerCode, Boolean batchBooking) {
         this.serviceLevelCode = serviceLevelCode;
         this.debtor = debtor;
         this.debtorAccount = Objects.requireNonNull(debtorAccount, "Debtor account cannot be null");
@@ -61,6 +62,7 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         this.requestedExecutionDate = Optional.ofNullable(requestedExecutionDate).orElse(LocalDate.now().plusDays(1));
         this.id = Optional.ofNullable(id).orElseGet(() -> FORMAT_AS_ID.format(this.creationDateTime));
         this.chargeBearerCode = Optional.ofNullable(chargeBearerCode).orElseGet(() -> ChargeBearerType1Code.SLEV);
+        this.batchBooking = Optional.ofNullable(batchBooking).orElse(false);
 
         try {
             this.datatypeFactory = DatatypeFactory.newInstance();
@@ -111,7 +113,7 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         PaymentInstructionInformation3 paymentInstructionInformationSCT3 = new PaymentInstructionInformation3();
         paymentInstructionInformationSCT3.setPmtInfId(this.id);
         paymentInstructionInformationSCT3.setPmtMtd(PaymentMethod3Code.TRF);
-        paymentInstructionInformationSCT3.setBtchBookg(false);
+        paymentInstructionInformationSCT3.setBtchBookg(this.batchBooking);
         paymentInstructionInformationSCT3.setNbOfTxs(String.valueOf(this.transactions.size()));
         paymentInstructionInformationSCT3.setCtrlSum(this.getTotalAmount());
         paymentInstructionInformationSCT3.setDbtr(partyIdentification(this.debtor));

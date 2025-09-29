@@ -80,6 +80,70 @@ class CreditTransferTest {
     }
 
     @Test
+    void test_with_all_fields_and_batchBooking() {
+
+        final Party debtor = Bank.simpleParty()
+                .name("Banque de France")
+                .build();
+        final BankAccount debtorAccount = Bank.simpleBankAccount()
+                .iban("FR7630001007941234567890185")
+                .bic("BDFEFRPPXXX")
+                .name("Compte de la Banque de France")
+                .build();
+
+        List<Transaction> transactions = new ArrayList<>();
+        for (int i = 1; i < 10; i++) {
+            transactions.add(Bank.simpleTransaction()
+                    .party(Bank.simpleParty()
+                            .name("Debtor " + i)
+                            .postalAddress(Bank.simplePostalAddress()
+                                    .type("ADDR")
+                                    .department("Dept")
+                                    .subDepartment("SubDept")
+                                    .streetName("115 rue de Sèvres")
+                                    .postCode("75006")
+                                    .townName("Paris")
+                                    .countrySubDivision("IDF")
+                                    .country("FR")
+                                    .build())
+                            .build())
+                    .account(Bank.simpleBankAccount()
+                            .iban("FR7610011000201234567890188")
+                            .bic("PSSTFRPP")
+                            .name("Debtor Account " + i)
+                            .build())
+                    .amount(i + "12.34")
+                    .currency("EUR")
+                    .endToEndId("ENDTOEND" + i)
+                    .id("ID" + i)
+                    .chargeBearerCode(ChargeBearerType1Code.CRED)
+                    .remittanceInformationUnstructured(Collections.singleton("My unstructured remittance information"))
+                    .build());
+        }
+
+        LocalDateTime newYear2021 = LocalDateTime.of(2021, 1, 1, 0, 0, 0, 0);
+        LocalDate nextDay = newYear2021.plusDays(1).toLocalDate();
+
+        CreditTransferOperation creditTransfer = Bank.jaxbCreditTransferSepa()
+                .debtor(debtor)
+                .debtorAccount(debtorAccount)
+                .transactions(transactions)
+                .id("MYID")
+                .creationDateTime(newYear2021)
+                .requestedExecutionDate(nextDay)
+                .chargeBearerCode(ChargeBearerType1Code.DEBT)
+                .batchBooking(true)
+                .build();
+
+        String xml = creditTransfer.marshal();
+
+        Assertions.assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Document xmlns=\"urn:iso:std:iso:20022:tech:xsd:pain.001.001.03\"><CstmrCdtTrfInitn><GrpHdr><MsgId>MYID</MsgId><CreDtTm>2021-01-01T00:00:00</CreDtTm><NbOfTxs>9</NbOfTxs><CtrlSum>4611.06</CtrlSum><InitgPty><Nm>Banque de France</Nm></InitgPty></GrpHdr><PmtInf><PmtInfId>MYID</PmtInfId><PmtMtd>TRF</PmtMtd><BtchBookg>true</BtchBookg><NbOfTxs>9</NbOfTxs><CtrlSum>4611.06</CtrlSum><PmtTpInf><SvcLvl><Cd>SEPA</Cd></SvcLvl></PmtTpInf><ReqdExctnDt>2021-01-02</ReqdExctnDt><Dbtr><Nm>Banque de France</Nm></Dbtr><DbtrAcct><Id><IBAN>FR7630001007941234567890185</IBAN></Id><Nm>Compte de la Banque de France</Nm></DbtrAcct><DbtrAgt><FinInstnId><BIC>BDFEFRPPXXX</BIC></FinInstnId></DbtrAgt><ChrgBr>DEBT</ChrgBr><CdtTrfTxInf><PmtId><InstrId>ID1</InstrId><EndToEndId>ENDTOEND1</EndToEndId></PmtId><Amt><InstdAmt Ccy=\"EUR\">112.34</InstdAmt></Amt><ChrgBr>CRED</ChrgBr><CdtrAgt><FinInstnId><BIC>PSSTFRPP</BIC></FinInstnId></CdtrAgt><Cdtr><Nm>Debtor 1</Nm><PstlAdr><AdrTp>ADDR</AdrTp><Dept>Dept</Dept><SubDept>SubDept</SubDept><StrtNm>115 rue de Sèvres</StrtNm><PstCd>75006</PstCd><TwnNm>Paris</TwnNm><CtrySubDvsn>IDF</CtrySubDvsn><Ctry>FR</Ctry></PstlAdr></Cdtr><CdtrAcct><Id><IBAN>FR7610011000201234567890188</IBAN></Id><Nm>Debtor Account 1</Nm></CdtrAcct><RmtInf><Ustrd>My unstructured remittance information</Ustrd></RmtInf></CdtTrfTxInf><CdtTrfTxInf><PmtId><InstrId>ID2</InstrId><EndToEndId>ENDTOEND2</EndToEndId></PmtId><Amt><InstdAmt Ccy=\"EUR\">212.34</InstdAmt></Amt><ChrgBr>CRED</ChrgBr><CdtrAgt><FinInstnId><BIC>PSSTFRPP</BIC></FinInstnId></CdtrAgt><Cdtr><Nm>Debtor 2</Nm><PstlAdr><AdrTp>ADDR</AdrTp><Dept>Dept</Dept><SubDept>SubDept</SubDept><StrtNm>115 rue de Sèvres</StrtNm><PstCd>75006</PstCd><TwnNm>Paris</TwnNm><CtrySubDvsn>IDF</CtrySubDvsn><Ctry>FR</Ctry></PstlAdr></Cdtr><CdtrAcct><Id><IBAN>FR7610011000201234567890188</IBAN></Id><Nm>Debtor Account 2</Nm></CdtrAcct><RmtInf><Ustrd>My unstructured remittance information</Ustrd></RmtInf></CdtTrfTxInf><CdtTrfTxInf><PmtId><InstrId>ID3</InstrId><EndToEndId>ENDTOEND3</EndToEndId></PmtId><Amt><InstdAmt Ccy=\"EUR\">312.34</InstdAmt></Amt><ChrgBr>CRED</ChrgBr><CdtrAgt><FinInstnId><BIC>PSSTFRPP</BIC></FinInstnId></CdtrAgt><Cdtr><Nm>Debtor 3</Nm><PstlAdr><AdrTp>ADDR</AdrTp><Dept>Dept</Dept><SubDept>SubDept</SubDept><StrtNm>115 rue de Sèvres</StrtNm><PstCd>75006</PstCd><TwnNm>Paris</TwnNm><CtrySubDvsn>IDF</CtrySubDvsn><Ctry>FR</Ctry></PstlAdr></Cdtr><CdtrAcct><Id><IBAN>FR7610011000201234567890188</IBAN></Id><Nm>Debtor Account 3</Nm></CdtrAcct><RmtInf><Ustrd>My unstructured remittance information</Ustrd></RmtInf></CdtTrfTxInf><CdtTrfTxInf><PmtId><InstrId>ID4</InstrId><EndToEndId>ENDTOEND4</EndToEndId></PmtId><Amt><InstdAmt Ccy=\"EUR\">412.34</InstdAmt></Amt><ChrgBr>CRED</ChrgBr><CdtrAgt><FinInstnId><BIC>PSSTFRPP</BIC></FinInstnId></CdtrAgt><Cdtr><Nm>Debtor 4</Nm><PstlAdr><AdrTp>ADDR</AdrTp><Dept>Dept</Dept><SubDept>SubDept</SubDept><StrtNm>115 rue de Sèvres</StrtNm><PstCd>75006</PstCd><TwnNm>Paris</TwnNm><CtrySubDvsn>IDF</CtrySubDvsn><Ctry>FR</Ctry></PstlAdr></Cdtr><CdtrAcct><Id><IBAN>FR7610011000201234567890188</IBAN></Id><Nm>Debtor Account 4</Nm></CdtrAcct><RmtInf><Ustrd>My unstructured remittance information</Ustrd></RmtInf></CdtTrfTxInf><CdtTrfTxInf><PmtId><InstrId>ID5</InstrId><EndToEndId>ENDTOEND5</EndToEndId></PmtId><Amt><InstdAmt Ccy=\"EUR\">512.34</InstdAmt></Amt><ChrgBr>CRED</ChrgBr><CdtrAgt><FinInstnId><BIC>PSSTFRPP</BIC></FinInstnId></CdtrAgt><Cdtr><Nm>Debtor 5</Nm><PstlAdr><AdrTp>ADDR</AdrTp><Dept>Dept</Dept><SubDept>SubDept</SubDept><StrtNm>115 rue de Sèvres</StrtNm><PstCd>75006</PstCd><TwnNm>Paris</TwnNm><CtrySubDvsn>IDF</CtrySubDvsn><Ctry>FR</Ctry></PstlAdr></Cdtr><CdtrAcct><Id><IBAN>FR7610011000201234567890188</IBAN></Id><Nm>Debtor Account 5</Nm></CdtrAcct><RmtInf><Ustrd>My unstructured remittance information</Ustrd></RmtInf></CdtTrfTxInf><CdtTrfTxInf><PmtId><InstrId>ID6</InstrId><EndToEndId>ENDTOEND6</EndToEndId></PmtId><Amt><InstdAmt Ccy=\"EUR\">612.34</InstdAmt></Amt><ChrgBr>CRED</ChrgBr><CdtrAgt><FinInstnId><BIC>PSSTFRPP</BIC></FinInstnId></CdtrAgt><Cdtr><Nm>Debtor 6</Nm><PstlAdr><AdrTp>ADDR</AdrTp><Dept>Dept</Dept><SubDept>SubDept</SubDept><StrtNm>115 rue de Sèvres</StrtNm><PstCd>75006</PstCd><TwnNm>Paris</TwnNm><CtrySubDvsn>IDF</CtrySubDvsn><Ctry>FR</Ctry></PstlAdr></Cdtr><CdtrAcct><Id><IBAN>FR7610011000201234567890188</IBAN></Id><Nm>Debtor Account 6</Nm></CdtrAcct><RmtInf><Ustrd>My unstructured remittance information</Ustrd></RmtInf></CdtTrfTxInf><CdtTrfTxInf><PmtId><InstrId>ID7</InstrId><EndToEndId>ENDTOEND7</EndToEndId></PmtId><Amt><InstdAmt Ccy=\"EUR\">712.34</InstdAmt></Amt><ChrgBr>CRED</ChrgBr><CdtrAgt><FinInstnId><BIC>PSSTFRPP</BIC></FinInstnId></CdtrAgt><Cdtr><Nm>Debtor 7</Nm><PstlAdr><AdrTp>ADDR</AdrTp><Dept>Dept</Dept><SubDept>SubDept</SubDept><StrtNm>115 rue de Sèvres</StrtNm><PstCd>75006</PstCd><TwnNm>Paris</TwnNm><CtrySubDvsn>IDF</CtrySubDvsn><Ctry>FR</Ctry></PstlAdr></Cdtr><CdtrAcct><Id><IBAN>FR7610011000201234567890188</IBAN></Id><Nm>Debtor Account 7</Nm></CdtrAcct><RmtInf><Ustrd>My unstructured remittance information</Ustrd></RmtInf></CdtTrfTxInf><CdtTrfTxInf><PmtId><InstrId>ID8</InstrId><EndToEndId>ENDTOEND8</EndToEndId></PmtId><Amt><InstdAmt Ccy=\"EUR\">812.34</InstdAmt></Amt><ChrgBr>CRED</ChrgBr><CdtrAgt><FinInstnId><BIC>PSSTFRPP</BIC></FinInstnId></CdtrAgt><Cdtr><Nm>Debtor 8</Nm><PstlAdr><AdrTp>ADDR</AdrTp><Dept>Dept</Dept><SubDept>SubDept</SubDept><StrtNm>115 rue de Sèvres</StrtNm><PstCd>75006</PstCd><TwnNm>Paris</TwnNm><CtrySubDvsn>IDF</CtrySubDvsn><Ctry>FR</Ctry></PstlAdr></Cdtr><CdtrAcct><Id><IBAN>FR7610011000201234567890188</IBAN></Id><Nm>Debtor Account 8</Nm></CdtrAcct><RmtInf><Ustrd>My unstructured remittance information</Ustrd></RmtInf></CdtTrfTxInf><CdtTrfTxInf><PmtId><InstrId>ID9</InstrId><EndToEndId>ENDTOEND9</EndToEndId></PmtId><Amt><InstdAmt Ccy=\"EUR\">912.34</InstdAmt></Amt><ChrgBr>CRED</ChrgBr><CdtrAgt><FinInstnId><BIC>PSSTFRPP</BIC></FinInstnId></CdtrAgt><Cdtr><Nm>Debtor 9</Nm><PstlAdr><AdrTp>ADDR</AdrTp><Dept>Dept</Dept><SubDept>SubDept</SubDept><StrtNm>115 rue de Sèvres</StrtNm><PstCd>75006</PstCd><TwnNm>Paris</TwnNm><CtrySubDvsn>IDF</CtrySubDvsn><Ctry>FR</Ctry></PstlAdr></Cdtr><CdtrAcct><Id><IBAN>FR7610011000201234567890188</IBAN></Id><Nm>Debtor Account 9</Nm></CdtrAcct><RmtInf><Ustrd>My unstructured remittance information</Ustrd></RmtInf></CdtTrfTxInf></PmtInf></CstmrCdtTrfInitn></Document>",
+                xml);
+
+        assertValid(xml);
+    }
+
+    @Test
     void test_with_account_other_id() {
 
         final Party debtor = Bank.simpleParty()

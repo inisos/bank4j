@@ -17,6 +17,7 @@ public class JAXBCreditTransferBuilder implements CreditTransferOperationBuilder
     private LocalDateTime creationDateTime;
     private LocalDate requestedExecutionDate;
     private ChargeBearerType1Code chargeBearerCode;
+    private Boolean batchBooking;
 
     @Override
     public CreditTransferOperationBuilder serviceLevelCode(String serviceLevelCode) {
@@ -73,7 +74,13 @@ public class JAXBCreditTransferBuilder implements CreditTransferOperationBuilder
     }
 
     @Override
+    public CreditTransferOperationBuilder batchBooking(Boolean batchBooking) {
+        this.batchBooking = batchBooking;
+        return this;
+    }
+
+    @Override
     public CreditTransferOperation build() {
-        return new JAXBCreditTransfer(serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate, chargeBearerCode);
+        return new JAXBCreditTransfer(serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate, chargeBearerCode, batchBooking);
     }
 }
