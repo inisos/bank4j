@@ -13,7 +13,7 @@ Using JAXB and [iban4j](https://github.com/arturmkrtchyan/iban4j).
 <dependency>
     <groupId>io.inisos.bank4j</groupId>
     <artifactId>bank4j</artifactId>
-    <version>3.0.1</version>
+    <version>3.1.0</version>
 </dependency>
 ```
 
@@ -76,18 +76,19 @@ class MyApp {
                 .account(Bank.simpleBankAccount()   // Creditor account
                         .iban("FR7630001007941234567890185") // IBAN
                         .bic("BDFEFRPP")                     // Optional BIC
-                        .build())           
+                        .build())
                 .amount("12.34")                                // Amount, converted to BigDecimal
                 .currency("EUR")                                // Currency code
                 .endToEndId("Transfer reference 1")             // End to end identifier
                 .id("Optional identifier 1")                    // Optional Transaction identifier
-                .chargeBearerCode(ChargeBearerType1Code.CRED)   // Optional charge bearer code defines who is bearing the charges of the transfer 
+                .chargeBearerCode(ChargeBearerType1Code.CRED)   // Optional charge bearer code defines who is bearing the charges of the transfer
+                .batchBooking(true)                             // Optional batch booking, defaults to false
                 .remittanceInformationUnstructured("Your remittance information")   // Unstructured Remittance Information 
                 .build();
         Transaction transaction2 = Bank.simpleTransaction()
                 .party(Bank.simpleParty()           // Optional creditor identification
                         .name("Creditor Name")                    // Optional name
-                        .build())                    
+                        .build())
                 .account(Bank.simpleBankAccount()   // Creditor account
                         .otherId("1234567890")               // Other identification
                         .bic("BDFEFRPP")                     // BIC
@@ -153,7 +154,7 @@ Output with formatting:
         <PmtInf>
             <PmtInfId>MYID</PmtInfId>
             <PmtMtd>TRF</PmtMtd>
-            <BtchBookg>false</BtchBookg>
+            <BtchBookg>true</BtchBookg>
             <NbOfTxs>2</NbOfTxs>
             <CtrlSum>69.12</CtrlSum>
             <PmtTpInf>
