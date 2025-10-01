@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import iso.std.iso._20022.tech.xsd.pain_001_001.ChargeBearerType1Code;
-
 /**
  * Transaction
  */
@@ -45,7 +43,7 @@ public interface Transaction {
     /**
      * @return who bears the transaction costs
      */
-    Optional<ChargeBearerType1Code> getChargeBearerCode();
+    Optional<ChargeBearer> getChargeBearer();
 
     /**
      * @return intermediary agents

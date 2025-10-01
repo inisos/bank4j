@@ -24,11 +24,19 @@ public class Bank {
     }
 
     public static CreditTransferOperationBuilder jaxbCreditTransferSepa() {
-        return new JAXBCreditTransferBuilder().sepa();
+        return jaxbCreditTransferSepa(CustomerCreditTransferInitiationVersion.V03);
+    }
+
+    public static CreditTransferOperationBuilder jaxbCreditTransferSepa(CustomerCreditTransferInitiationVersion version) {
+        return jaxbCreditTransfer(version).sepa();
     }
 
     public static CreditTransferOperationBuilder jaxbCreditTransfer() {
-        return new JAXBCreditTransferBuilder();
+        return jaxbCreditTransfer(CustomerCreditTransferInitiationVersion.V03);
+    }
+
+    public static CreditTransferOperationBuilder jaxbCreditTransfer(CustomerCreditTransferInitiationVersion version) {
+        return new JAXBCreditTransferBuilder().version(version);
     }
 
     private Bank() {
