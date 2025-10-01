@@ -16,40 +16,53 @@ import java.util.Set;
 
 class TransactionValidatorTest {
     private static Validator validator;
-    private static TransactionBuilder defaultTransaction;
 
     @BeforeAll
     public static void setUpValidator() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-        defaultTransaction = Bank.simpleTransaction()
-            .account(Bank.simpleBankAccount()
-                .iban("FR7630001007941234567890185")
-                .build())
-            .amount("200")
-            .currency("EUR")
-            .endToEndId("MyEndToEndId");
+    }
+
+    private static TransactionBuilder buildDefaultTransaction() {
+        return Bank.simpleTransaction()
+                .account(Bank.simpleBankAccount()
+                        .iban("FR7630001007941234567890185")
+                        .build())
+                .amount("200")
+                .currency("EUR")
+                .endToEndId("MyEndToEndId");
     }
 
     @Test
     public void isValid_pass_with_valid_remittance_information() {
-        Transaction transaction = defaultTransaction
+        Transaction transaction = buildDefaultTransaction()
             .remittanceInformationUnstructured(Collections.singleton("My unstructured remittance information"))
             .build();
 
             Set<ConstraintViolation<Transaction>> violations = validator.validate(transaction);
 
-            Assertions.assertTrue(violations.isEmpty());
+            Assertions.assertTrue(violations.isEmpty(), "Expected no validation violations, but found: " + violations);
     }
 
     @Test
     public void isValid_fail_with_invalid_remittance_information() {
-        Transaction transaction = defaultTransaction
+        Transaction transaction = buildDefaultTransaction()
             .remittanceInformationUnstructured(Collections.singleton("kxwzbfbkuxjvpgwdrmbvjzgyjtgewfuopbseeuvzobmxhyiuzyxxksoqitapigozpeeoidjjxzfpixzybktauxsllyfcxiwucomrogwpewlevyflervetnxhjacuwnpbxlqlwcxdswsrf"))
             .build();
 
             Set<ConstraintViolation<Transaction>> violations = validator.validate(transaction);
 
             Assertions.assertTrue(violations.size() > 0);
+    }
+
+    @Test
+    public void isValid_fail_with_eref_exceeding_max_length() {
+        Transaction transaction = buildDefaultTransaction()
+                .endToEndId("abcdefghijklmnopqrstuvwxyzabcdefghij") // 36 characters, max is 35
+                .build();
+
+        Set<ConstraintViolation<Transaction>> violations = validator.validate(transaction);
+
+        Assertions.assertTrue(violations.size() > 0);
     }
 }

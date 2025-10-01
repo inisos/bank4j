@@ -23,6 +23,7 @@ public class SimpleTransaction implements Transaction {
     private final BigDecimal amount;
     private final Currency currency;
     @Iso20022CharacterSet
+    @Size(max = 35)
     private final String endToEndId;
     @Iso20022CharacterSet
     private final String id;
