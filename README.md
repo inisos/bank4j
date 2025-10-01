@@ -158,6 +158,7 @@ Output with formatting:
         <PmtInf>
             <PmtInfId>MYID</PmtInfId>
             <PmtMtd>TRF</PmtMtd>
+            <BtchBookg>true</BtchBookg>
             <BtchBookg>false</BtchBookg>
             <NbOfTxs>2</NbOfTxs>
             <CtrlSum>69.12</CtrlSum>
