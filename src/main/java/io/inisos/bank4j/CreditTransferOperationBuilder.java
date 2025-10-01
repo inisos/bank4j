@@ -35,5 +35,7 @@ public interface CreditTransferOperationBuilder {
 
     CreditTransferOperationBuilder chargeBearerCode(ChargeBearerType1Code chargeBearerCode);
 
+    CreditTransferOperationBuilder batchBooking(Boolean batchBooking);
+
     CreditTransferOperation build();
 }
