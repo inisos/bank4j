@@ -331,25 +331,28 @@ public class JAXBCreditTransferV03 implements CreditTransferOperation {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (!(o instanceof JAXBCreditTransferV03)) return false;
         JAXBCreditTransferV03 that = (JAXBCreditTransferV03) o;
-        return serviceLevelCode.equals(that.serviceLevelCode) && debtor.equals(that.debtor) && getTransactions().equals(that.getTransactions()) && id.equals(that.id) && creationDateTime.equals(that.creationDateTime) && requestedExecutionDate.equals(that.requestedExecutionDate);
+        return batchBooking == that.batchBooking && instructionPriority == that.instructionPriority && Objects.equals(serviceLevelCode, that.serviceLevelCode) && Objects.equals(debtor, that.debtor) && Objects.equals(debtorAccount, that.debtorAccount) && Objects.equals(transactions, that.transactions) && Objects.equals(id, that.id) && Objects.equals(creationDateTime, that.creationDateTime) && Objects.equals(requestedExecutionDate, that.requestedExecutionDate) && chargeBearer == that.chargeBearer;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(serviceLevelCode, debtor, getTransactions(), id, creationDateTime, requestedExecutionDate);
+        return Objects.hash(instructionPriority, serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate, chargeBearer, batchBooking);
     }
 
     @Override
     public String toString() {
         return new StringJoiner(", ", JAXBCreditTransferV03.class.getSimpleName() + "[", "]")
+                .add("instructionPriority=" + instructionPriority)
                 .add("serviceLevelCode='" + serviceLevelCode + "'")
                 .add("debtor=" + debtor)
+                .add("debtorAccount=" + debtorAccount)
                 .add("id='" + id + "'")
                 .add("creationDateTime=" + creationDateTime)
                 .add("requestedExecutionDate=" + requestedExecutionDate)
+                .add("chargeBearer=" + chargeBearer)
+                .add("batchBooking=" + batchBooking)
                 .toString();
     }
 }
