@@ -27,6 +27,7 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
 
     private static final DateTimeFormatter FORMAT_AS_ID = DateTimeFormatter.ofPattern("yyyyMMddhhmmss");
 
+    private final Priority instructionPriority;
     private final String serviceLevelCode;
     private final Party debtor;
     private final BankAccount debtorAccount;
@@ -44,6 +45,7 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
     /**
      * Constructor
      *
+     * @param instructionPriority    optional priority
      * @param serviceLevelCode       optional e.g. "SEPA"
      * @param debtor                 optional debtor
      * @param debtorAccount          debtor account
@@ -53,7 +55,8 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
      * @param requestedExecutionDate optional requested execution date and time, defaults to tomorrow
      * @param chargeBearerCode       optional charge bearer code defines who is bearing the charges of the transfer, by default it is set to 'SLEV' (Service Level)
      */
-    public JAXBCreditTransfer(String serviceLevelCode, Party debtor, BankAccount debtorAccount, Collection<Transaction> transactions, String id, LocalDateTime creationDateTime, LocalDate requestedExecutionDate, ChargeBearerType1Code chargeBearerCode, Boolean batchBooking) {
+    public JAXBCreditTransfer(Priority instructionPriority, String serviceLevelCode, Party debtor, BankAccount debtorAccount, Collection<Transaction> transactions, String id, LocalDateTime creationDateTime, LocalDate requestedExecutionDate, ChargeBearerType1Code chargeBearerCode, Boolean batchBooking) {
+        this.instructionPriority = instructionPriority;
         this.serviceLevelCode = serviceLevelCode;
         this.debtor = debtor;
         this.debtorAccount = Objects.requireNonNull(debtorAccount, "Debtor account cannot be null");
@@ -120,13 +123,16 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         paymentInstructionInformationSCT3.setDbtrAcct(cashAccount(this.debtorAccount));
         paymentInstructionInformationSCT3.setDbtrAgt(mandatoryBranchAndFinancialInstitutionIdentification(this.debtorAccount));
 
+        PaymentTypeInformation19 paymentTypeInformation = new PaymentTypeInformation19();
+        if (this.instructionPriority != null) {
+            paymentTypeInformation.setInstrPrty(Priority2Code.fromValue(this.instructionPriority.name()));
+        }
         if (this.serviceLevelCode != null) {
             ServiceLevel8Choice serviceLevel = new ServiceLevel8Choice();
             serviceLevel.setCd(this.serviceLevelCode);
-            PaymentTypeInformation19 paymentTypeInformation = new PaymentTypeInformation19();
             paymentTypeInformation.setSvcLvl(serviceLevel);
-            paymentInstructionInformationSCT3.setPmtTpInf(paymentTypeInformation);
         }
+        paymentInstructionInformationSCT3.setPmtTpInf(paymentTypeInformation);
 
         paymentInstructionInformationSCT3.setReqdExctnDt(this.datatypeFactory.newXMLGregorianCalendar(DateTimeFormatter.ISO_LOCAL_DATE.format(requestedExecutionDate)));
 
@@ -271,6 +277,11 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
             throw new IllegalArgumentException("IBAN or otherId must be provided");
         }
         return accountIdentification;
+    }
+
+    @Override
+    public Priority getInstructionPriority() {
+        return instructionPriority;
     }
 
     @Override

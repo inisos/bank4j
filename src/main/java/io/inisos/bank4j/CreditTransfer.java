@@ -11,6 +11,8 @@ import java.util.Optional;
  */
 public interface CreditTransfer {
 
+    Priority getInstructionPriority();
+
     Optional<Party> getDebtor();
 
     BankAccount getDebtorAccount();

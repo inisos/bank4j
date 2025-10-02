@@ -1,10 +1,10 @@
 package io.inisos.bank4j;
 
+import iso.std.iso._20022.tech.xsd.pain_001_001.ChargeBearerType1Code;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
-
-import iso.std.iso._20022.tech.xsd.pain_001_001.ChargeBearerType1Code;
 
 public interface CreditTransferOperationBuilder {
     /**
@@ -16,6 +16,8 @@ public interface CreditTransferOperationBuilder {
     default CreditTransferOperationBuilder sepa() {
         return serviceLevelCode("SEPA");
     }
+
+    CreditTransferOperationBuilder instructionPriority(Priority priority);
 
     CreditTransferOperationBuilder serviceLevelCode(String serviceLevelCode);
 

@@ -121,6 +121,7 @@ class MyApp {
 
         // Transfer
         CreditTransferOperation creditTransfer = Bank.jaxbCreditTransferSepa()
+                .instructionPriority(Priority.HIGH)                  // Optional instruction priority
                 .debtor(debtor)                                      // Optional debtor
                 .debtorAccount(debtorAccount)                        // Mandatory debtor account
                 .transaction(transaction1)                           // At least 1 transaction
@@ -162,6 +163,7 @@ Output with formatting:
             <NbOfTxs>2</NbOfTxs>
             <CtrlSum>69.12</CtrlSum>
             <PmtTpInf>
+                <InstrPrty>HIGH</InstrPrty>
                 <SvcLvl>
                     <Cd>SEPA</Cd>
                 </SvcLvl>

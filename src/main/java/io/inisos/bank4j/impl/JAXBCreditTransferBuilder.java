@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class JAXBCreditTransferBuilder implements CreditTransferOperationBuilder {
+    private Priority instructionPriority;
     private String serviceLevelCode;
     private Party debtor;
     private BankAccount debtorAccount;
@@ -18,6 +19,12 @@ public class JAXBCreditTransferBuilder implements CreditTransferOperationBuilder
     private LocalDate requestedExecutionDate;
     private ChargeBearerType1Code chargeBearerCode;
     private Boolean batchBooking;
+
+    @Override
+    public JAXBCreditTransferBuilder instructionPriority(Priority instructionPriority) {
+        this.instructionPriority = instructionPriority;
+        return this;
+    }
 
     @Override
     public CreditTransferOperationBuilder serviceLevelCode(String serviceLevelCode) {
@@ -81,6 +88,6 @@ public class JAXBCreditTransferBuilder implements CreditTransferOperationBuilder
 
     @Override
     public CreditTransferOperation build() {
-        return new JAXBCreditTransfer(serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate, chargeBearerCode, batchBooking);
+        return new JAXBCreditTransfer(instructionPriority, serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate, chargeBearerCode, batchBooking);
     }
 }
