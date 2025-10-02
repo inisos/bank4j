@@ -10,7 +10,7 @@
     <packaging>jar</packaging>
 
     <name>bank4j</name>
-    <description>Generates ISO 20022 XML Transfers and provides IBAN and BIC validation</description>
+    <description>Generates ISO 20022 Payment Initiation XML messages and provides IBAN and BIC validation</description>
     <url>https://bank4j.inisos.io</url>
 
     <licenses>
