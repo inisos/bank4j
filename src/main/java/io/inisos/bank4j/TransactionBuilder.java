@@ -5,8 +5,6 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Set;
 
-import iso.std.iso._20022.tech.xsd.pain_001_001.ChargeBearerType1Code;
-
 public interface TransactionBuilder {
 
     TransactionBuilder party(Party party);
@@ -41,7 +39,7 @@ public interface TransactionBuilder {
 
     TransactionBuilder id(String id);
 
-    TransactionBuilder chargeBearerCode(ChargeBearerType1Code chargeBearerCode);
+    TransactionBuilder chargeBearerCode(ChargeBearer chargeBearer);
 
     TransactionBuilder intermediaryAgents(List<BankAccount> intermediaryAgents);
 

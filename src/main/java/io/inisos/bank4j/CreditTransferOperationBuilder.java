@@ -1,9 +1,8 @@
 package io.inisos.bank4j;
 
-import iso.std.iso._20022.tech.xsd.pain_001_001.ChargeBearerType1Code;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 
 public interface CreditTransferOperationBuilder {
@@ -35,7 +34,9 @@ public interface CreditTransferOperationBuilder {
 
     CreditTransferOperationBuilder requestedExecutionDate(LocalDate requestedExecutionDate);
 
-    CreditTransferOperationBuilder chargeBearerCode(ChargeBearerType1Code chargeBearerCode);
+    CreditTransferOperationBuilder requestedExecutionDateTime(ZonedDateTime requestedExecutionDateTime);
+
+    CreditTransferOperationBuilder chargeBearer(ChargeBearer chargeBearer);
 
     CreditTransferOperationBuilder batchBooking(Boolean batchBooking);
 

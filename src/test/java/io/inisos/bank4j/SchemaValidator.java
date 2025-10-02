@@ -1,6 +1,5 @@
 package io.inisos.bank4j;
 
-import iso.std.iso._20022.tech.xsd.pain_001_001.ObjectFactory;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
@@ -17,10 +16,26 @@ import java.io.Reader;
 
 public class SchemaValidator {
 
-    public static void validateCreditTransfer(Reader reader) throws IOException, JAXBException, SAXException {
-        try (InputStream resourceAsStream = SchemaValidator.class.getClassLoader().getResourceAsStream("pain.001.001.03.xsd")) {
+    public static void validateCreditTransfer(CustomerCreditTransferInitiationVersion version, Reader reader) throws IOException, JAXBException, SAXException {
 
-            JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+        String xsd;
+        Class<?> clazz;
+        switch (version) {
+            case V03:
+                xsd = "pain.001.001.03.xsd";
+                clazz = iso._20022.pain_001_001_03.ObjectFactory.class;
+                break;
+            case V09:
+                xsd = "pain.001.001.09.xsd";
+                clazz = iso._20022.pain_001_001_09.ObjectFactory.class;
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported version: " + version);
+        }
+
+        try (InputStream resourceAsStream = SchemaValidator.class.getClassLoader().getResourceAsStream(xsd)) {
+
+            JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
 
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 

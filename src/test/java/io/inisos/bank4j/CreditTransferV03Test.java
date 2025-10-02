@@ -1,6 +1,5 @@
 package io.inisos.bank4j;
 
-import iso.std.iso._20022.tech.xsd.pain_001_001.ChargeBearerType1Code;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -11,10 +10,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static io.inisos.bank4j.CustomerCreditTransferInitiationVersion.V03;
+
 /**
  * @author Patrice Blanchardie
  */
-class CreditTransferTest {
+class CreditTransferV03Test {
 
     @Test
     void test_with_all_fields() {
@@ -53,7 +54,7 @@ class CreditTransferTest {
                     .currency("EUR")
                     .endToEndId("ENDTOEND" + i)
                     .id("ID" + i)
-                    .chargeBearerCode(ChargeBearerType1Code.CRED)
+                    .chargeBearerCode(ChargeBearer.CRED)
                     .remittanceInformationUnstructured(Collections.singleton("My unstructured remittance information"))
                     .build());
         }
@@ -69,7 +70,7 @@ class CreditTransferTest {
                 .id("MYID")
                 .creationDateTime(newYear2021)
                 .requestedExecutionDate(nextDay)
-                .chargeBearerCode(ChargeBearerType1Code.DEBT)
+                .chargeBearer(ChargeBearer.DEBT)
                 .build();
 
         String xml = creditTransfer.marshal();
@@ -117,7 +118,7 @@ class CreditTransferTest {
                     .currency("EUR")
                     .endToEndId("ENDTOEND" + i)
                     .id("ID" + i)
-                    .chargeBearerCode(ChargeBearerType1Code.CRED)
+                    .chargeBearerCode(ChargeBearer.CRED)
                     .remittanceInformationUnstructured(Collections.singleton("My unstructured remittance information"))
                     .build());
         }
@@ -132,7 +133,7 @@ class CreditTransferTest {
                 .id("MYID")
                 .creationDateTime(newYear2021)
                 .requestedExecutionDate(nextDay)
-                .chargeBearerCode(ChargeBearerType1Code.DEBT)
+                .chargeBearer(ChargeBearer.DEBT)
                 .batchBooking(true)
                 .build();
 
@@ -289,6 +290,6 @@ class CreditTransferTest {
     }
 
     private void assertValid(String xml) {
-        Assertions.assertDoesNotThrow(() -> SchemaValidator.validateCreditTransfer(new StringReader(xml)));
+        Assertions.assertDoesNotThrow(() -> SchemaValidator.validateCreditTransfer(V03, new StringReader(xml)));
     }
 }

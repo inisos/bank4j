@@ -1,10 +1,10 @@
 package io.inisos.bank4j.impl;
 
 import io.inisos.bank4j.BankAccount;
+import io.inisos.bank4j.ChargeBearer;
 import io.inisos.bank4j.Party;
 import io.inisos.bank4j.Transaction;
 import io.inisos.bank4j.validator.constraints.Iso20022CharacterSet;
-import iso.std.iso._20022.tech.xsd.pain_001_001.ChargeBearerType1Code;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 
@@ -27,18 +27,18 @@ public class SimpleTransaction implements Transaction {
     private final String endToEndId;
     @Iso20022CharacterSet
     private final String id;
-    private final ChargeBearerType1Code chargeBearerCode;
+    private final ChargeBearer chargeBearer;
     private final List<BankAccount> intermediaryAgents;
     private final Set<@Valid @Size(max = 140) String> remittanceInformationUnstructured;
 
-    public SimpleTransaction(Party party, BankAccount account, BigDecimal amount, Currency currency, String endToEndId, String id, ChargeBearerType1Code chargeBearerCode, List<BankAccount> intermediaryAgents, Set<String> remittanceInformationUnstructured) {
+    public SimpleTransaction(Party party, BankAccount account, BigDecimal amount, Currency currency, String endToEndId, String id, ChargeBearer chargeBearer, List<BankAccount> intermediaryAgents, Set<String> remittanceInformationUnstructured) {
         this.party = party;
         this.account = Objects.requireNonNull(account, "Account cannot be null");
         this.amount = Objects.requireNonNull(amount, "Amount cannot be null");
         this.currency = Objects.requireNonNull(currency, "Currency cannot be null");
         this.endToEndId = Objects.requireNonNull(endToEndId, "End to end id cannot be null");
         this.id = id;
-        this.chargeBearerCode = chargeBearerCode;
+        this.chargeBearer = chargeBearer;
         this.intermediaryAgents = Optional.ofNullable(intermediaryAgents).orElse(Collections.emptyList());
         this.remittanceInformationUnstructured = Optional.ofNullable(remittanceInformationUnstructured).orElse(Collections.emptySet());
         if (this.intermediaryAgents.size() > 3) {
@@ -77,8 +77,8 @@ public class SimpleTransaction implements Transaction {
     }
 
     @Override
-    public Optional<ChargeBearerType1Code> getChargeBearerCode() {
-        return Optional.ofNullable(chargeBearerCode);
+    public Optional<ChargeBearer> getChargeBearer() {
+        return Optional.ofNullable(chargeBearer);
     }
 
     @Override
@@ -96,12 +96,12 @@ public class SimpleTransaction implements Transaction {
         if (this == o) return true;
         if (!(o instanceof SimpleTransaction)) return false;
         SimpleTransaction that = (SimpleTransaction) o;
-        return getParty().equals(that.getParty()) && getAccount().equals(that.getAccount()) && getAmount().equals(that.getAmount()) && currency.equals(that.currency) && getEndToEndId().equals(that.getEndToEndId()) && Objects.equals(getId(), that.getId()) && getChargeBearerCode().equals(that.getChargeBearerCode()) && getIntermediaryAgents().equals(that.getIntermediaryAgents()) && getRemittanceInformationUnstructured().equals(that.getRemittanceInformationUnstructured());
+        return getParty().equals(that.getParty()) && getAccount().equals(that.getAccount()) && getAmount().equals(that.getAmount()) && currency.equals(that.currency) && getEndToEndId().equals(that.getEndToEndId()) && Objects.equals(getId(), that.getId()) && getChargeBearer().equals(that.getChargeBearer()) && getIntermediaryAgents().equals(that.getIntermediaryAgents()) && getRemittanceInformationUnstructured().equals(that.getRemittanceInformationUnstructured());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getParty(), getAccount(), getAmount(), currency, getEndToEndId(), getId(), getChargeBearerCode(), getIntermediaryAgents(), getRemittanceInformationUnstructured());
+        return Objects.hash(getParty(), getAccount(), getAmount(), currency, getEndToEndId(), getId(), getChargeBearer(), getIntermediaryAgents(), getRemittanceInformationUnstructured());
     }
 
     @Override
@@ -113,7 +113,7 @@ public class SimpleTransaction implements Transaction {
                 .add("currency=" + currency)
                 .add("endToEndId='" + endToEndId + "'")
                 .add("id='" + id + "'")
-                .add("chargeBearerCode=" + chargeBearerCode)
+                .add("chargeBearerCode=" + chargeBearer)
                 .add("intermediaryAgents=" + intermediaryAgents)
                 .add("remittanceInformationUnstructured=" + getRemittanceInformationUnstructured())
                 .toString();

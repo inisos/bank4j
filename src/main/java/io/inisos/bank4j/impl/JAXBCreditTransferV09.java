@@ -1,7 +1,7 @@
 package io.inisos.bank4j.impl;
 
 import io.inisos.bank4j.*;
-import iso.std.iso._20022.tech.xsd.pain_001_001.*;
+import iso._20022.pain_001_001_09.*;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
@@ -15,15 +15,16 @@ import javax.xml.namespace.QName;
 import java.io.Writer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
- * A JAXB ISO 20022 Credit Transfer with PAIN.001.001.03
+ * A JAXB ISO 20022 Credit Transfer with PAIN.001.001.09
  *
  * @author Patrice Blanchardie
  */
-public class JAXBCreditTransfer implements CreditTransferOperation {
+public class JAXBCreditTransferV09 implements CreditTransferOperation {
 
     private static final DateTimeFormatter FORMAT_AS_ID = DateTimeFormatter.ofPattern("yyyyMMddhhmmss");
 
@@ -35,36 +36,56 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
     private final String id;
     private final LocalDateTime creationDateTime;
     private final LocalDate requestedExecutionDate;
-    private final ChargeBearerType1Code chargeBearerCode;
+    private final ZonedDateTime requestedExecutionDateTime;
+    private final ChargeBearer chargeBearer;
     private final boolean batchBooking;
 
     private final DatatypeFactory datatypeFactory;
 
-    private final CustomerCreditTransferInitiationV03 customerCreditTransferInitiation;
+    private final CustomerCreditTransferInitiationV09 customerCreditTransferInitiation;
 
     /**
      * Constructor
      *
-     * @param instructionPriority    optional priority
-     * @param serviceLevelCode       optional e.g. "SEPA"
-     * @param debtor                 optional debtor
-     * @param debtorAccount          debtor account
-     * @param transactions           transactions (cannot contain duplicates)
-     * @param id                     optional identifier, defaults to execution date and time
-     * @param creationDateTime       optional message creation date and time, defaults to now
-     * @param requestedExecutionDate optional requested execution date and time, defaults to tomorrow
-     * @param chargeBearerCode       optional charge bearer code defines who is bearing the charges of the transfer, by default it is set to 'SLEV' (Service Level)
+     * @param instructionPriority        optional priority
+     * @param serviceLevelCode           optional e.g. "SEPA"
+     * @param debtor                     optional debtor
+     * @param debtorAccount              debtor account
+     * @param transactions               transactions (cannot contain duplicates)
+     * @param id                         optional identifier, defaults to execution date and time
+     * @param creationDateTime           optional message creation date and time, defaults to now
+     * @param requestedExecutionDate     optional requested execution date, defaults to tomorrow
+     * @param requestedExecutionDateTime optional requested execution date and time
+     * @param chargeBearer               optional charge bearer code defines who is bearing the charges of the transfer, by default it is set to 'SLEV' (Service Level)
      */
-    public JAXBCreditTransfer(Priority instructionPriority, String serviceLevelCode, Party debtor, BankAccount debtorAccount, Collection<Transaction> transactions, String id, LocalDateTime creationDateTime, LocalDate requestedExecutionDate, ChargeBearerType1Code chargeBearerCode, Boolean batchBooking) {
+    public JAXBCreditTransferV09(Priority instructionPriority,
+                                 String serviceLevelCode,
+                                 Party debtor,
+                                 BankAccount debtorAccount,
+                                 Collection<Transaction> transactions,
+                                 String id,
+                                 LocalDateTime creationDateTime,
+                                 LocalDate requestedExecutionDate,
+                                 ZonedDateTime requestedExecutionDateTime,
+                                 ChargeBearer chargeBearer,
+                                 Boolean batchBooking) {
         this.instructionPriority = instructionPriority;
         this.serviceLevelCode = serviceLevelCode;
         this.debtor = debtor;
         this.debtorAccount = Objects.requireNonNull(debtorAccount, "Debtor account cannot be null");
         this.transactions = requireTransaction(Objects.requireNonNull(transactions));
         this.creationDateTime = Optional.ofNullable(creationDateTime).orElse(LocalDateTime.now());
-        this.requestedExecutionDate = Optional.ofNullable(requestedExecutionDate).orElse(LocalDate.now().plusDays(1));
+        if(requestedExecutionDate != null && requestedExecutionDateTime != null) {
+            throw new IllegalArgumentException("You cannot specify both requestedExecutionDate and requestedExecutionDateTime");
+        }
+        this.requestedExecutionDateTime = requestedExecutionDateTime;
+        if(this.requestedExecutionDateTime == null) {
+            this.requestedExecutionDate = Optional.ofNullable(requestedExecutionDate).orElse(LocalDate.now().plusDays(1));
+        } else {
+            this.requestedExecutionDate = null;
+        }
         this.id = Optional.ofNullable(id).orElseGet(() -> FORMAT_AS_ID.format(this.creationDateTime));
-        this.chargeBearerCode = Optional.ofNullable(chargeBearerCode).orElseGet(() -> ChargeBearerType1Code.SLEV);
+        this.chargeBearer = Optional.ofNullable(chargeBearer).orElse(ChargeBearer.SLEV);
         this.batchBooking = Optional.ofNullable(batchBooking).orElse(false);
 
         try {
@@ -102,18 +123,18 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         document.setCstmrCdtTrfInitn(this.customerCreditTransferInitiation);
 
         return new JAXBElement<>(
-                new QName("urn:iso:std:iso:20022:tech:xsd:pain.001.001.03", "Document"),
+                new QName("urn:iso:std:iso:20022:tech:xsd:pain.001.001.09", "Document"),
                 Document.class,
                 document);
     }
 
-    private CustomerCreditTransferInitiationV03 build() {
+    private CustomerCreditTransferInitiationV09 build() {
 
-        CustomerCreditTransferInitiationV03 cti = new CustomerCreditTransferInitiationV03();
+        CustomerCreditTransferInitiationV09 cti = new CustomerCreditTransferInitiationV09();
 
         cti.setGrpHdr(header());
 
-        PaymentInstructionInformation3 paymentInstructionInformationSCT3 = new PaymentInstructionInformation3();
+        PaymentInstruction30 paymentInstructionInformationSCT3 = new PaymentInstruction30();
         paymentInstructionInformationSCT3.setPmtInfId(this.id);
         paymentInstructionInformationSCT3.setPmtMtd(PaymentMethod3Code.TRF);
         paymentInstructionInformationSCT3.setBtchBookg(this.batchBooking);
@@ -123,20 +144,28 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         paymentInstructionInformationSCT3.setDbtrAcct(cashAccount(this.debtorAccount));
         paymentInstructionInformationSCT3.setDbtrAgt(mandatoryBranchAndFinancialInstitutionIdentification(this.debtorAccount));
 
-        PaymentTypeInformation19 paymentTypeInformation = new PaymentTypeInformation19();
+        PaymentTypeInformation26 paymentTypeInformation = new PaymentTypeInformation26();
         if (this.instructionPriority != null) {
             paymentTypeInformation.setInstrPrty(Priority2Code.fromValue(this.instructionPriority.name()));
         }
         if (this.serviceLevelCode != null) {
             ServiceLevel8Choice serviceLevel = new ServiceLevel8Choice();
             serviceLevel.setCd(this.serviceLevelCode);
-            paymentTypeInformation.setSvcLvl(serviceLevel);
+            paymentTypeInformation.getSvcLvl().add(serviceLevel);
         }
         paymentInstructionInformationSCT3.setPmtTpInf(paymentTypeInformation);
 
-        paymentInstructionInformationSCT3.setReqdExctnDt(this.datatypeFactory.newXMLGregorianCalendar(DateTimeFormatter.ISO_LOCAL_DATE.format(requestedExecutionDate)));
+        DateAndDateTime2Choice dateAndDateTime2Choice = new DateAndDateTime2Choice();
+        if(requestedExecutionDate != null) {
+            dateAndDateTime2Choice.setDt(this.datatypeFactory.newXMLGregorianCalendar(DateTimeFormatter.ISO_LOCAL_DATE.format(requestedExecutionDate)));
+        } else if(requestedExecutionDateTime != null) {
+            dateAndDateTime2Choice.setDtTm(this.datatypeFactory.newXMLGregorianCalendar(DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(requestedExecutionDateTime)));
+        } else {
+            throw new IllegalArgumentException("Either requestedExecutionDate or requestedExecutionDateTime must be set");
+        }
+        paymentInstructionInformationSCT3.setReqdExctnDt(dateAndDateTime2Choice);
 
-        paymentInstructionInformationSCT3.setChrgBr(this.chargeBearerCode);
+        paymentInstructionInformationSCT3.setChrgBr(ChargeBearerType1Code.fromValue(this.chargeBearer.name()));
 
         for (Transaction transaction : this.transactions) {
             paymentInstructionInformationSCT3.getCdtTrfTxInf().add(transaction(transaction));
@@ -147,8 +176,8 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         return cti;
     }
 
-    private GroupHeader32 header() {
-        GroupHeader32 head = new GroupHeader32();
+    private GroupHeader85 header() {
+        GroupHeader85 head = new GroupHeader85();
         head.setMsgId(id);
         head.setCreDtTm(this.datatypeFactory.newXMLGregorianCalendar(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(creationDateTime)));
         head.setNbOfTxs(String.valueOf(this.transactions.size()));
@@ -157,10 +186,10 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         return head;
     }
 
-    private CreditTransferTransactionInformation10 transaction(Transaction transaction) {
+    private CreditTransferTransaction34 transaction(Transaction transaction) {
 
         // payment identification
-        PaymentIdentification1 paymentIdentificationSEPA = new PaymentIdentification1();
+        PaymentIdentification6 paymentIdentificationSEPA = new PaymentIdentification6();
         paymentIdentificationSEPA.setEndToEndId(transaction.getEndToEndId());
         transaction.getId().ifPresent(paymentIdentificationSEPA::setInstrId);
 
@@ -168,11 +197,11 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         ActiveOrHistoricCurrencyAndAmount activeOrHistoricCurrencyAndAmount = new ActiveOrHistoricCurrencyAndAmount();
         activeOrHistoricCurrencyAndAmount.setCcy(transaction.getCurrencyCode());
         activeOrHistoricCurrencyAndAmount.setValue(transaction.getAmount());
-        AmountType3Choice amountType = new AmountType3Choice();
+        AmountType4Choice amountType = new AmountType4Choice();
         amountType.setInstdAmt(activeOrHistoricCurrencyAndAmount);
 
         // transaction
-        CreditTransferTransactionInformation10 creditTransferTransactionInformation = new CreditTransferTransactionInformation10();
+        CreditTransferTransaction34 creditTransferTransactionInformation = new CreditTransferTransaction34();
         creditTransferTransactionInformation.setPmtId(paymentIdentificationSEPA);
         creditTransferTransactionInformation.setAmt(amountType);
         creditTransferTransactionInformation.setCdtr(partyIdentification(transaction.getParty().orElse(null)));
@@ -180,12 +209,14 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
 
         // remittance information
         if (transaction.getRemittanceInformationUnstructured().size() > 0) {
-            RemittanceInformation5 remittanceInformation = new RemittanceInformation5();
+            RemittanceInformation16 remittanceInformation = new RemittanceInformation16();
             remittanceInformation.getUstrd().addAll(transaction.getRemittanceInformationUnstructured());
             creditTransferTransactionInformation.setRmtInf(remittanceInformation);
         }
 
-        transaction.getChargeBearerCode().ifPresent(creditTransferTransactionInformation::setChrgBr);
+        transaction.getChargeBearer()
+                .map(cb -> ChargeBearerType1Code.fromValue(cb.name()))
+                .ifPresent(creditTransferTransactionInformation::setChrgBr);
 
         optionalBranchAndFinancialInstitutionIdentificationOpt(transaction.getAccount()).ifPresent(creditTransferTransactionInformation::setCdtrAgt);
         Iterator<BankAccount> intermediaryAgentsIterator = transaction.getIntermediaryAgents().iterator();
@@ -208,30 +239,30 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         return creditTransferTransactionInformation;
     }
 
-    private Optional<BranchAndFinancialInstitutionIdentification4> optionalBranchAndFinancialInstitutionIdentificationOpt(BankAccount bankAccount) {
+    private Optional<BranchAndFinancialInstitutionIdentification6> optionalBranchAndFinancialInstitutionIdentificationOpt(BankAccount bankAccount) {
         return bankAccount.getBic().map(bic -> {
             BicUtil.validate(bic);
-            FinancialInstitutionIdentification7 financialInstitutionIdentification = new FinancialInstitutionIdentification7();
-            financialInstitutionIdentification.setBIC(bic);
-            BranchAndFinancialInstitutionIdentification4 branchAndFinancialInstitutionIdentification = new BranchAndFinancialInstitutionIdentification4();
+            FinancialInstitutionIdentification18 financialInstitutionIdentification = new FinancialInstitutionIdentification18();
+            financialInstitutionIdentification.setBICFI(bic);
+            BranchAndFinancialInstitutionIdentification6 branchAndFinancialInstitutionIdentification = new BranchAndFinancialInstitutionIdentification6();
             branchAndFinancialInstitutionIdentification.setFinInstnId(financialInstitutionIdentification);
             return branchAndFinancialInstitutionIdentification;
         });
     }
 
-    private BranchAndFinancialInstitutionIdentification4 mandatoryBranchAndFinancialInstitutionIdentification(BankAccount bankAccount) {
-        BranchAndFinancialInstitutionIdentification4 branchAndFinancialInstitutionIdentification = new BranchAndFinancialInstitutionIdentification4();
-        FinancialInstitutionIdentification7 financialInstitutionIdentification = new FinancialInstitutionIdentification7();
+    private BranchAndFinancialInstitutionIdentification6 mandatoryBranchAndFinancialInstitutionIdentification(BankAccount bankAccount) {
+        BranchAndFinancialInstitutionIdentification6 branchAndFinancialInstitutionIdentification = new BranchAndFinancialInstitutionIdentification6();
+        FinancialInstitutionIdentification18 financialInstitutionIdentification = new FinancialInstitutionIdentification18();
         bankAccount.getBic().ifPresent(bic -> {
             BicUtil.validate(bic);
-            financialInstitutionIdentification.setBIC(bic);
+            financialInstitutionIdentification.setBICFI(bic);
         });
         branchAndFinancialInstitutionIdentification.setFinInstnId(financialInstitutionIdentification);
         return branchAndFinancialInstitutionIdentification;
     }
 
-    private PartyIdentification32 partyIdentification(Party party) {
-        PartyIdentification32 partyIdentification = new PartyIdentification32();
+    private PartyIdentification135 partyIdentification(Party party) {
+        PartyIdentification135 partyIdentification = new PartyIdentification135();
         if (party != null) {
             party.getName().ifPresent(partyIdentification::setNm);
             party.getPostalAddress().map(this::postalAddress).ifPresent(partyIdentification::setPstlAdr);
@@ -239,23 +270,31 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
         return partyIdentification;
     }
 
-    private PostalAddress6 postalAddress(PostalAddress postalAddress) {
-        PostalAddress6 postalAddress6 = new PostalAddress6();
-        postalAddress.getType().ifPresent(typeCode -> postalAddress6.setAdrTp(AddressType2Code.fromValue(typeCode)));
-        postalAddress.getDepartment().ifPresent(postalAddress6::setDept);
-        postalAddress.getSubDepartment().ifPresent(postalAddress6::setSubDept);
-        postalAddress.getStreetName().ifPresent(postalAddress6::setStrtNm);
-        postalAddress.getBuildingNumber().ifPresent(postalAddress6::setBldgNb);
-        postalAddress.getTownName().ifPresent(postalAddress6::setTwnNm);
-        postalAddress.getPostCode().ifPresent(postalAddress6::setPstCd);
-        postalAddress.getCountrySubDivision().ifPresent(postalAddress6::setCtrySubDvsn);
-        postalAddress.getCountry().ifPresent(postalAddress6::setCtry);
-        postalAddress.getAddressLines().forEach(addressLine -> postalAddress6.getAdrLine().add(addressLine));
-        return postalAddress6;
+    private PostalAddress24 postalAddress(PostalAddress postalAddress) {
+        PostalAddress24 postalAddress24 = new PostalAddress24();
+
+        postalAddress.getType()
+                .map(AddressType2Code::fromValue)
+                .map(addressType2Code -> {
+                    AddressType3Choice addressType3Choice = new AddressType3Choice();
+                    addressType3Choice.setCd(addressType2Code);
+                    return addressType3Choice;
+                })
+                .ifPresent(postalAddress24::setAdrTp);
+        postalAddress.getDepartment().ifPresent(postalAddress24::setDept);
+        postalAddress.getSubDepartment().ifPresent(postalAddress24::setSubDept);
+        postalAddress.getStreetName().ifPresent(postalAddress24::setStrtNm);
+        postalAddress.getBuildingNumber().ifPresent(postalAddress24::setBldgNb);
+        postalAddress.getTownName().ifPresent(postalAddress24::setTwnNm);
+        postalAddress.getPostCode().ifPresent(postalAddress24::setPstCd);
+        postalAddress.getCountrySubDivision().ifPresent(postalAddress24::setCtrySubDvsn);
+        postalAddress.getCountry().ifPresent(postalAddress24::setCtry);
+        postalAddress.getAddressLines().forEach(addressLine -> postalAddress24.getAdrLine().add(addressLine));
+        return postalAddress24;
     }
 
-    private CashAccount16 cashAccount(BankAccount bankAccount) {
-        CashAccount16 cashAccount = new CashAccount16();
+    private CashAccount38 cashAccount(BankAccount bankAccount) {
+        CashAccount38 cashAccount = new CashAccount38();
         cashAccount.setId(accountIdentification(bankAccount));
         bankAccount.getName().ifPresent(cashAccount::setNm);
         return cashAccount;
@@ -310,6 +349,11 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
     }
 
     @Override
+    public ZonedDateTime getRequestedExecutionDateTime() {
+        return requestedExecutionDateTime;
+    }
+
+    @Override
     public Collection<Transaction> getTransactions() {
         return transactions;
     }
@@ -323,25 +367,29 @@ public class JAXBCreditTransfer implements CreditTransferOperation {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof JAXBCreditTransfer)) return false;
-        JAXBCreditTransfer that = (JAXBCreditTransfer) o;
-        return serviceLevelCode.equals(that.serviceLevelCode) && debtor.equals(that.debtor) && getTransactions().equals(that.getTransactions()) && id.equals(that.id) && creationDateTime.equals(that.creationDateTime) && requestedExecutionDate.equals(that.requestedExecutionDate);
+        if (!(o instanceof JAXBCreditTransferV09)) return false;
+        JAXBCreditTransferV09 that = (JAXBCreditTransferV09) o;
+        return batchBooking == that.batchBooking && instructionPriority == that.instructionPriority && Objects.equals(serviceLevelCode, that.serviceLevelCode) && Objects.equals(debtor, that.debtor) && Objects.equals(debtorAccount, that.debtorAccount) && Objects.equals(transactions, that.transactions) && Objects.equals(id, that.id) && Objects.equals(creationDateTime, that.creationDateTime) && Objects.equals(requestedExecutionDate, that.requestedExecutionDate) && Objects.equals(requestedExecutionDateTime, that.requestedExecutionDateTime) && chargeBearer == that.chargeBearer;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(serviceLevelCode, debtor, getTransactions(), id, creationDateTime, requestedExecutionDate);
+        return Objects.hash(instructionPriority, serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate, requestedExecutionDateTime, chargeBearer, batchBooking);
     }
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", JAXBCreditTransfer.class.getSimpleName() + "[", "]")
+        return new StringJoiner(", ", JAXBCreditTransferV09.class.getSimpleName() + "[", "]")
+                .add("instructionPriority=" + instructionPriority)
                 .add("serviceLevelCode='" + serviceLevelCode + "'")
                 .add("debtor=" + debtor)
+                .add("debtorAccount=" + debtorAccount)
                 .add("id='" + id + "'")
                 .add("creationDateTime=" + creationDateTime)
                 .add("requestedExecutionDate=" + requestedExecutionDate)
+                .add("requestedExecutionDateTime=" + requestedExecutionDateTime)
+                .add("chargeBearer=" + chargeBearer)
+                .add("batchBooking=" + batchBooking)
                 .toString();
     }
 }

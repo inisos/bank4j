@@ -3,6 +3,7 @@ package io.inisos.bank4j;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -22,6 +23,8 @@ public interface CreditTransfer {
     LocalDateTime getCreationDateTime();
 
     LocalDate getRequestedExecutionDate();
+
+    ZonedDateTime getRequestedExecutionDateTime();
 
     Collection<Transaction> getTransactions();
 
