@@ -14,6 +14,8 @@ public interface CreditTransfer {
 
     Priority getInstructionPriority();
 
+    String getServiceLevelCode();
+
     Optional<Party> getDebtor();
 
     BankAccount getDebtorAccount();
@@ -27,6 +29,10 @@ public interface CreditTransfer {
     ZonedDateTime getRequestedExecutionDateTime();
 
     Collection<Transaction> getTransactions();
+
+    ChargeBearer getChargeBearer();
+
+    boolean isBatchBooking();
 
     default BigDecimal getTotalAmount() {
         return getTransactions()

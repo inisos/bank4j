@@ -288,6 +288,11 @@ public class JAXBCreditTransferV03 implements CreditTransferOperation {
     }
 
     @Override
+    public String getServiceLevelCode() {
+        return serviceLevelCode;
+    }
+
+    @Override
     public Optional<Party> getDebtor() {
         return Optional.ofNullable(debtor);
     }
@@ -320,6 +325,16 @@ public class JAXBCreditTransferV03 implements CreditTransferOperation {
     @Override
     public Collection<Transaction> getTransactions() {
         return transactions;
+    }
+
+    @Override
+    public ChargeBearer getChargeBearer() {
+        return chargeBearer;
+    }
+
+    @Override
+    public boolean isBatchBooking() {
+        return batchBooking;
     }
 
     private <T> Collection<T> requireTransaction(Collection<T> collection) {
