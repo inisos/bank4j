@@ -6,7 +6,7 @@
 
     <groupId>io.inisos.bank4j</groupId>
     <artifactId>bank4j</artifactId>
-    <version>3.2.0</version>
+    <version>main-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>bank4j</name>
