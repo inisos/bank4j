@@ -283,7 +283,7 @@ Output with formatting:
 </Document>
 ```
 
-Eg. with V09 and omitted optional fields:
+Eg. with V09 and omitted (most) optional fields:
 
 ```java
 import io.inisos.bank4j.Bank;
@@ -319,6 +319,7 @@ class MyApp {
                         .plusDays(1)                                         // defaults to tomorrow
                         .withSecond(0)
                         .withNano(0))                                        
+                .instantPayment(true)                                        // Optional instant payment. If not defined it will not be instructed as instant payment
                 .build();
 
         // export to string
@@ -353,6 +354,9 @@ Output with formatting:
                 <SvcLvl>
                     <Cd>SEPA</Cd>
                 </SvcLvl>
+                <LclInstrm>
+                    <Cd>INST</Cd>
+                </LclInstrm>
             </PmtTpInf>
             <ReqdExctnDt>
                 <DtTm>2025-10-03T09:30:00+02:00</DtTm>

@@ -40,5 +40,7 @@ public interface CreditTransferOperationBuilder {
 
     CreditTransferOperationBuilder batchBooking(Boolean batchBooking);
 
+    CreditTransferOperationBuilder instantPayment(Boolean instantPayment);
+
     CreditTransferOperation build();
 }

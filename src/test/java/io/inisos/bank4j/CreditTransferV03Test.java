@@ -289,6 +289,13 @@ class CreditTransferV03Test {
         assertValid(xml);
     }
 
+    @Test
+    void test_instant_payment_is_not_allowed_for_v03() {
+        var creditTransferOperationBuilder = Bank.jaxbCreditTransferSepa();
+        Assertions.assertThrows(IllegalStateException.class, () -> creditTransferOperationBuilder.instantPayment(true),
+        "Instant payment is not allowed for pain.001.001.03");
+    }
+
     private void assertValid(String xml) {
         Assertions.assertDoesNotThrow(() -> SchemaValidator.validateCreditTransfer(V03, new StringReader(xml)));
     }
