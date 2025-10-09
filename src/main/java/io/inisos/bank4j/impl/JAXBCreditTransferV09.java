@@ -39,6 +39,7 @@ public class JAXBCreditTransferV09 implements CreditTransferOperation {
     private final ZonedDateTime requestedExecutionDateTime;
     private final ChargeBearer chargeBearer;
     private final boolean batchBooking;
+    private final Boolean instantPayment;
 
     private final DatatypeFactory datatypeFactory;
 
@@ -68,13 +69,15 @@ public class JAXBCreditTransferV09 implements CreditTransferOperation {
                                  LocalDate requestedExecutionDate,
                                  ZonedDateTime requestedExecutionDateTime,
                                  ChargeBearer chargeBearer,
-                                 Boolean batchBooking) {
+                                 Boolean batchBooking,
+                                 Boolean instantPayment) {
         this.instructionPriority = instructionPriority;
         this.serviceLevelCode = serviceLevelCode;
         this.debtor = debtor;
         this.debtorAccount = Objects.requireNonNull(debtorAccount, "Debtor account cannot be null");
         this.transactions = requireTransaction(Objects.requireNonNull(transactions));
         this.creationDateTime = Optional.ofNullable(creationDateTime).orElse(LocalDateTime.now());
+        this.instantPayment = instantPayment;
         if(requestedExecutionDate != null && requestedExecutionDateTime != null) {
             throw new IllegalArgumentException("You cannot specify both requestedExecutionDate and requestedExecutionDateTime");
         }
@@ -153,6 +156,11 @@ public class JAXBCreditTransferV09 implements CreditTransferOperation {
             serviceLevel.setCd(this.serviceLevelCode);
             paymentTypeInformation.getSvcLvl().add(serviceLevel);
         }
+        if (this.instantPayment != null && this.instantPayment) {
+            paymentTypeInformation.setLclInstrm(new LocalInstrument2Choice());
+            paymentTypeInformation.getLclInstrm().setCd("INST");
+        }
+
         paymentInstructionInformationSCT3.setPmtTpInf(paymentTypeInformation);
 
         DateAndDateTime2Choice dateAndDateTime2Choice = new DateAndDateTime2Choice();
