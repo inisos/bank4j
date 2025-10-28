@@ -261,9 +261,11 @@ public class JAXBCreditTransferV09 implements CreditTransferOperation {
     private BranchAndFinancialInstitutionIdentification6 mandatoryBranchAndFinancialInstitutionIdentification(BankAccount bankAccount) {
         BranchAndFinancialInstitutionIdentification6 branchAndFinancialInstitutionIdentification = new BranchAndFinancialInstitutionIdentification6();
         FinancialInstitutionIdentification18 financialInstitutionIdentification = new FinancialInstitutionIdentification18();
-        bankAccount.getBic().ifPresent(bic -> {
+        bankAccount.getBic().ifPresentOrElse(bic -> {
             BicUtil.validate(bic);
             financialInstitutionIdentification.setBICFI(bic);
+        }, () -> {
+            throw new IllegalArgumentException("BIC must be provided for debtor account");
         });
         branchAndFinancialInstitutionIdentification.setFinInstnId(financialInstitutionIdentification);
         return branchAndFinancialInstitutionIdentification;
