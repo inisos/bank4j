@@ -21,6 +21,7 @@ public class JAXBCreditTransferBuilder implements CreditTransferOperationBuilder
     private ZonedDateTime requestedExecutionDateTime;
     private ChargeBearer chargeBearer;
     private Boolean batchBooking;
+    private Boolean instantPayment;
 
     public JAXBCreditTransferBuilder version(CustomerCreditTransferInitiationVersion version) {
         this.version = version;
@@ -109,6 +110,15 @@ public class JAXBCreditTransferBuilder implements CreditTransferOperationBuilder
     }
 
     @Override
+    public CreditTransferOperationBuilder instantPayment(Boolean instantPayment) {
+        if (version != CustomerCreditTransferInitiationVersion.V09) {
+            throw new IllegalStateException("Only version 09 supports instantPayments");
+        }
+        this.instantPayment = instantPayment;
+        return this;
+    }
+
+    @Override
     public CreditTransferOperation build() {
         if (version == null) {
             throw new IllegalStateException("Version must be set");
@@ -117,7 +127,7 @@ public class JAXBCreditTransferBuilder implements CreditTransferOperationBuilder
             case V03:
                 return new JAXBCreditTransferV03(instructionPriority, serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate, chargeBearer, batchBooking);
             case V09:
-                return new JAXBCreditTransferV09(instructionPriority, serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate, requestedExecutionDateTime, chargeBearer, batchBooking);
+                return new JAXBCreditTransferV09(instructionPriority, serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate, requestedExecutionDateTime, chargeBearer, batchBooking, instantPayment);
             default:
                 throw new IllegalArgumentException("Unsupported version: " + version);
         }
