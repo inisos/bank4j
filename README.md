@@ -299,6 +299,7 @@ class MyApp {
         // Debtor account
         BankAccount debtorAccount = Bank.simpleBankAccount()
                 .iban("FR7610011000201234567890188") // IBAN
+                .bic("PSSTFRPP")                     // BIC (required for V09!)
                 .build();
 
         // Transactions
