@@ -118,6 +118,8 @@ public class JAXBCreditTransferBuilder implements CreditTransferOperationBuilder
                 return new JAXBCreditTransferV03(instructionPriority, serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate, chargeBearer, batchBooking);
             case V09:
                 return new JAXBCreditTransferV09(instructionPriority, serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate, requestedExecutionDateTime, chargeBearer, batchBooking);
+            case V03_CH_02:
+                return new JAXBCreditTransferV03Ch02(instructionPriority, serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate, chargeBearer, batchBooking);
             default:
                 throw new IllegalArgumentException("Unsupported version: " + version);
         }

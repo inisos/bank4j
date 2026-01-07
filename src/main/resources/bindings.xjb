@@ -12,5 +12,10 @@
             <jxb:package name="iso._20022.pain_001_001_09"/>
         </jxb:schemaBindings>
     </jxb:bindings>
+    <jxb:bindings schemaLocation="pain.001.001.03.ch.02.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="iso._20022.pain_001_001_03_ch_02"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
 
 </jxb:bindings>

@@ -29,6 +29,10 @@ public class SchemaValidator {
                 xsd = "pain.001.001.09.xsd";
                 clazz = iso._20022.pain_001_001_09.ObjectFactory.class;
                 break;
+            case V03_CH_02:
+                xsd = "pain.001.001.03.ch.02.xsd";
+                clazz = iso._20022.pain_001_001_03_ch_02.ObjectFactory.class;
+                break;
             default:
                 throw new IllegalArgumentException("Unsupported version: " + version);
         }
