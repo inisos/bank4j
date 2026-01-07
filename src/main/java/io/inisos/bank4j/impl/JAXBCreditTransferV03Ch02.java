@@ -32,7 +32,7 @@ import java.util.StringJoiner;
 public class JAXBCreditTransferV03Ch02 implements CreditTransferOperation {
 
     private static final DateTimeFormatter FORMAT_AS_ID = DateTimeFormatter.ofPattern("yyyyMMddhhmmss");
-    private static final String SCHEMA_LOCATION = "http://www.six-interbank-clearing.com/de/pain.001.001.03.ch.02.xsd";
+    private static final String SCHEMA_LOCATION = "http://www.six-interbank-clearing.com/de/pain.001.001.03.ch.02.xsd pain.001.001.03.ch.02.xsd";
 
     private final Priority instructionPriority;
     private final String serviceLevelCode;
