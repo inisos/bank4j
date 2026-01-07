@@ -89,8 +89,9 @@ public class JAXBCreditTransferBuilder implements CreditTransferOperationBuilder
         if (requestedExecutionDate != null) {
             throw new IllegalStateException("Only one of requestedExecutionDate and requestedExecutionDateTime can be set, not both");
         }
-        if (version != CustomerCreditTransferInitiationVersion.V09) {
-            throw new IllegalStateException("Only version 09 supports requestedExecutionDateTime");
+        if (version != CustomerCreditTransferInitiationVersion.V09
+            && version != CustomerCreditTransferInitiationVersion.V12) {
+            throw new IllegalStateException("Only version 09+ supports requestedExecutionDateTime");
         }
         this.requestedExecutionDateTime = requestedExecutionDateTime;
         return this;
@@ -118,6 +119,8 @@ public class JAXBCreditTransferBuilder implements CreditTransferOperationBuilder
                 return new JAXBCreditTransferV03(instructionPriority, serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate, chargeBearer, batchBooking);
             case V09:
                 return new JAXBCreditTransferV09(instructionPriority, serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate, requestedExecutionDateTime, chargeBearer, batchBooking);
+            case V12:
+                return new JAXBCreditTransferV12(instructionPriority, serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate, requestedExecutionDateTime, chargeBearer, batchBooking);
             case V003_03:
                 return new JAXBSepaCreditTransfer003V03(instructionPriority, serviceLevelCode, debtor, debtorAccount, transactions, id, creationDateTime, requestedExecutionDate, chargeBearer, batchBooking);
             default:

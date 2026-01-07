@@ -29,6 +29,10 @@ public class SchemaValidator {
                 xsd = "pain.001.001.09.xsd";
                 clazz = iso._20022.pain_001_001_09.ObjectFactory.class;
                 break;
+            case V12:
+                xsd = "pain.001.001.12.xsd";
+                clazz = iso._20022.pain_001_001_12.ObjectFactory.class;
+                break;
             case V003_03:
                 xsd = "pain.001.003.03.xsd";
                 clazz = iso._20022.pain_001_003_03.ObjectFactory.class;
