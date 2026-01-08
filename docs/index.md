@@ -1,23 +1,30 @@
 ## bank4j
 
-Easily generate XML Credit Transfers based on [ISO 20022](https://www.iso20022.org/) Payments Initiation `pain.001.001.03`.
+Easily generate XML Credit Transfers based on [ISO 20022](https://www.iso20022.org/) Payments Initiation (`pain`):
 
-Provides IBAN and BIC validation with annotations.
+- `pain.001.001.03`
+- `pain.001.001.03.ch.02`
+- `pain.001.001.09`
+- `pain.001.003.03`
+
+Provides IBAN, BIC and Character set (for reference elements) validation with annotations.
 
 Using JAXB and [iban4j](https://github.com/arturmkrtchyan/iban4j).
 
-### Installation
+Tested with [Qonto](https://qonto.com) bulk SEPA transfers.
+
+## Installation
 
 ```xml
 
 <dependency>
     <groupId>io.inisos.bank4j</groupId>
     <artifactId>bank4j</artifactId>
-    <version>3.1.0</version>
+    <version>4.1.0</version>
 </dependency>
 ```
 
-* Use version 3 for `jarkarta.*` dependencies (Java 11, JAXB 3+, Bean Validation 3+)
+* Use version 3+ for `jarkarta.*` dependencies (Java 11, JAXB 3+, Bean Validation 3+)
 * Use version 2 for `javax.*` dependencies (Java 8, JAXB 2, Bean Validation 2)
 
 ## Usage
@@ -43,7 +50,9 @@ Only accepts valid IBAN, BIC8/BIC11 and valid ISO 20022 patterns.
 
 ### Bulk SEPA transfers
 
-Simply provide bank account details and transactions:
+Simply provide bank account details and transactions.
+
+Eg. with V03:
 
 ```java
 import io.inisos.bank4j.Bank;
@@ -81,23 +90,23 @@ class MyApp {
                 .currency("EUR")                                // Currency code
                 .endToEndId("Transfer reference 1")             // End to end identifier
                 .id("Optional identifier 1")                    // Optional Transaction identifier
-                .chargeBearerCode(ChargeBearerType1Code.CRED)   // Optional charge bearer code defines who is bearing the charges of the transfer
+                .chargeBearer(ChargeBearer.CRED)                // Optional charge bearer code defines who is bearing the charges of the transfer
                 .batchBooking(true)                             // Optional batch booking, defaults to false
                 .remittanceInformationUnstructured("Your remittance information")   // Unstructured Remittance Information 
                 .build();
         Transaction transaction2 = Bank.simpleTransaction()
                 .party(Bank.simpleParty()           // Optional creditor identification
-                        .name("Creditor Name")                    // Optional name
+                        .name("Creditor Name")               // Optional name
                         .build())
                 .account(Bank.simpleBankAccount()   // Creditor account
                         .otherId("1234567890")               // Other identification
                         .bic("BDFEFRPP")                     // BIC
-                        .build())           // Creditor account
+                        .build())
                 .amount(new BigDecimal("56.78"))    // Amount as BigDecimal
                 .currency("EUR")                    // Currency code
                 .endToEndId("Transfer reference 2") // End to end identifier
                 .id("Optional identifier 2")        // Optional transaction identifier
-                .chargeBearerCode(ChargeBearerType1Code.DEBT)   // Optional charge bearer code defines who is bearing the charges of the transfer
+                .chargeBearerCode(ChargeBearer.DEBT)   // Optional charge bearer code defines who is bearing the charges of the transfer
                 .intermediaryAgent(Bank.simpleBankAccount() // Optional intermediary agent 1
                         .name("BNP PARIBAS")                 // Optional name
                         .otherId("12345")                    // Optional other identification
@@ -116,7 +125,8 @@ class MyApp {
                 .build();
 
         // Transfer
-        CreditTransferOperation creditTransfer = Bank.jaxbCreditTransferSepa()
+        CreditTransferOperation creditTransfer = Bank.jaxbCreditTransferSepa() // defaults to V03
+                .instructionPriority(Priority.HIGH)                  // Optional instruction priority
                 .debtor(debtor)                                      // Optional debtor
                 .debtorAccount(debtorAccount)                        // Mandatory debtor account
                 .transaction(transaction1)                           // At least 1 transaction
@@ -124,7 +134,7 @@ class MyApp {
                 .creationDateTime(LocalDateTime.now())               // Optional message creation date and time, defaults to now
                 .requestedExecutionDate(LocalDate.now().plusDays(1)) // Optional requested execution date, defaults to tomorrow
                 .id("MYID")                                          // Optional identifier, defaults to creation date and time as yyyyMMddhhmmss
-                .chargeBearerCode(ChargeBearerType1Code.DEBT)        // Optional charge bearer code defines who is bearing the charges of the transfer 
+                .chargeBearer(ChargeBearerType1Code.DEBT)        // Optional charge bearer code defines who is bearing the charges of the transfer 
                 .build();
 
         // export to string
@@ -158,6 +168,7 @@ Output with formatting:
             <NbOfTxs>2</NbOfTxs>
             <CtrlSum>69.12</CtrlSum>
             <PmtTpInf>
+                <InstrPrty>HIGH</InstrPrty>
                 <SvcLvl>
                     <Cd>SEPA</Cd>
                 </SvcLvl>
@@ -269,6 +280,109 @@ Output with formatting:
                 <RmtInf>
                     <Ustrd>Your remittance information</Ustrd>
                 </RmtInf>
+            </CdtTrfTxInf>
+        </PmtInf>
+    </CstmrCdtTrfInitn>
+</Document>
+```
+
+Eg. with V09 and omitted optional fields:
+
+```java
+import io.inisos.bank4j.Bank;
+
+import java.time.ZonedDateTime;
+
+import static io.inisos.bank4j.CustomerCreditTransferInitiationVersion.V09;
+
+class MyApp {
+
+    public static void main(String... args) {
+
+        // Debtor account
+        BankAccount debtorAccount = Bank.simpleBankAccount()
+                .iban("FR7610011000201234567890188") // IBAN
+                .build();
+
+        // Transactions
+        Transaction transaction1 = Bank.simpleTransaction()
+                .account(Bank.simpleBankAccount()   // Creditor account
+                        .iban("FR7630001007941234567890185") // IBAN
+                        .build())
+                .amount("12.34")                                // Amount, converted to BigDecimal
+                .currency("EUR")                                // Currency code
+                .endToEndId("Transfer reference 1")             // End-to-end identifier
+                .build();
+
+        // Transfer
+        CreditTransferOperation creditTransfer = Bank.jaxbCreditTransferSepa(V09) // version 09
+                .debtorAccount(debtorAccount)                                // Mandatory debtor account
+                .transaction(transaction1)                                   // At least 1 transaction
+                .requestedExecutionDateTime(ZonedDateTime.now()              // Optional requested execution date and time,
+                        .plusDays(1)                                         // defaults to tomorrow
+                        .withSecond(0)
+                        .withNano(0))                                        
+                .build();
+
+        // export to string
+        String formattedOutput = creditTransfer.marshal(true); // true: enables formatting
+
+        // or export to file
+        creditTransfer.marshal(new FileWriter("myFile.xml")); // default: disables formatting
+    }
+}
+```
+
+Output with formatting:
+
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.09">
+    <CstmrCdtTrfInitn>
+        <GrpHdr>
+            <MsgId>20251002092807</MsgId>
+            <CreDtTm>2025-10-02T09:28:07.3573245</CreDtTm>
+            <NbOfTxs>1</NbOfTxs>
+            <CtrlSum>12.34</CtrlSum>
+            <InitgPty/>
+        </GrpHdr>
+        <PmtInf>
+            <PmtInfId>20251002092807</PmtInfId>
+            <PmtMtd>TRF</PmtMtd>
+            <BtchBookg>false</BtchBookg>
+            <NbOfTxs>1</NbOfTxs>
+            <CtrlSum>12.34</CtrlSum>
+            <PmtTpInf>
+                <SvcLvl>
+                    <Cd>SEPA</Cd>
+                </SvcLvl>
+            </PmtTpInf>
+            <ReqdExctnDt>
+                <DtTm>2025-10-03T09:30:00+02:00</DtTm>
+            </ReqdExctnDt>
+            <Dbtr/>
+            <DbtrAcct>
+                <Id>
+                    <IBAN>FR7610011000201234567890188</IBAN>
+                </Id>
+            </DbtrAcct>
+            <DbtrAgt>
+                <FinInstnId/>
+            </DbtrAgt>
+            <ChrgBr>SLEV</ChrgBr>
+            <CdtTrfTxInf>
+                <PmtId>
+                    <EndToEndId>Transfer reference 1</EndToEndId>
+                </PmtId>
+                <Amt>
+                    <InstdAmt Ccy="EUR">12.34</InstdAmt>
+                </Amt>
+                <Cdtr/>
+                <CdtrAcct>
+                    <Id>
+                        <IBAN>FR7630001007941234567890185</IBAN>
+                    </Id>
+                </CdtrAcct>
             </CdtTrfTxInf>
         </PmtInf>
     </CstmrCdtTrfInitn>
