@@ -13,8 +13,6 @@ Provides IBAN, BIC and Character set (for reference elements) validation with an
 
 Using JAXB and [iban4j](https://github.com/arturmkrtchyan/iban4j).
 
-Tested with [Qonto](https://qonto.com) bulk SEPA transfers.
-
 ## Installation
 
 ```xml
@@ -50,11 +48,114 @@ class MyRecord {
 
 Only accepts valid IBAN, BIC8/BIC11 and valid ISO 20022 patterns.
 
-### Bulk SEPA transfers
+### Generation of XML messages
 
-Simply provide bank account details and transactions.
+For Payments Initiation, simply provide bank account details and transactions.
 
-Eg. with V03:
+Minimal example with V09 (omitted optional fields):
+
+```java
+import io.inisos.bank4j.Bank;
+
+import java.time.ZonedDateTime;
+
+import static io.inisos.bank4j.CustomerCreditTransferInitiationVersion.V09;
+
+class MyApp {
+
+    public static void main(String... args) {
+
+        // Debtor account
+        BankAccount debtorAccount = Bank.simpleBankAccount()
+                .iban("FR7610011000201234567890188") // IBAN
+                .build();
+
+        // Transactions
+        Transaction transaction1 = Bank.simpleTransaction()
+                .account(Bank.simpleBankAccount()   // Creditor account
+                        .iban("FR7630001007941234567890185") // IBAN
+                        .build())
+                .amount("12.34")                                // Amount, converted to BigDecimal
+                .currency("EUR")                                // Currency code
+                .endToEndId("Transfer reference 1")             // End-to-end identifier
+                .build();
+
+        // Transfer
+        CreditTransferOperation creditTransfer = Bank.jaxbCreditTransferSepa(V09) // version 09
+                .debtorAccount(debtorAccount)                                // Mandatory debtor account
+                .transaction(transaction1)                                   // At least 1 transaction
+                .requestedExecutionDateTime(ZonedDateTime.now()              // Optional requested execution date and time,
+                        .plusDays(1)                                         // defaults to tomorrow
+                        .withSecond(0)
+                        .withNano(0))                                        
+                .build();
+
+        // export to string
+        String formattedOutput = creditTransfer.marshal(true); // true: enables formatting
+
+        // or export to file
+        creditTransfer.marshal(new FileWriter("myFile.xml")); // default: disables formatting
+    }
+}
+```
+
+Output with formatting:
+
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.09">
+    <CstmrCdtTrfInitn>
+        <GrpHdr>
+            <MsgId>20251002092807</MsgId>
+            <CreDtTm>2025-10-02T09:28:07.3573245</CreDtTm>
+            <NbOfTxs>1</NbOfTxs>
+            <CtrlSum>12.34</CtrlSum>
+            <InitgPty/>
+        </GrpHdr>
+        <PmtInf>
+            <PmtInfId>20251002092807</PmtInfId>
+            <PmtMtd>TRF</PmtMtd>
+            <BtchBookg>false</BtchBookg>
+            <NbOfTxs>1</NbOfTxs>
+            <CtrlSum>12.34</CtrlSum>
+            <PmtTpInf>
+                <SvcLvl>
+                    <Cd>SEPA</Cd>
+                </SvcLvl>
+            </PmtTpInf>
+            <ReqdExctnDt>
+                <DtTm>2025-10-03T09:30:00+02:00</DtTm>
+            </ReqdExctnDt>
+            <Dbtr/>
+            <DbtrAcct>
+                <Id>
+                    <IBAN>FR7610011000201234567890188</IBAN>
+                </Id>
+            </DbtrAcct>
+            <DbtrAgt>
+                <FinInstnId/>
+            </DbtrAgt>
+            <ChrgBr>SLEV</ChrgBr>
+            <CdtTrfTxInf>
+                <PmtId>
+                    <EndToEndId>Transfer reference 1</EndToEndId>
+                </PmtId>
+                <Amt>
+                    <InstdAmt Ccy="EUR">12.34</InstdAmt>
+                </Amt>
+                <Cdtr/>
+                <CdtrAcct>
+                    <Id>
+                        <IBAN>FR7630001007941234567890185</IBAN>
+                    </Id>
+                </CdtrAcct>
+            </CdtTrfTxInf>
+        </PmtInf>
+    </CstmrCdtTrfInitn>
+</Document>
+```
+
+Eg. with V03 and optional fields:
 
 ```java
 import io.inisos.bank4j.Bank;
@@ -288,109 +389,6 @@ Output with formatting:
 </Document>
 ```
 
-Eg. with V09 and omitted optional fields:
-
-```java
-import io.inisos.bank4j.Bank;
-
-import java.time.ZonedDateTime;
-
-import static io.inisos.bank4j.CustomerCreditTransferInitiationVersion.V09;
-
-class MyApp {
-
-    public static void main(String... args) {
-
-        // Debtor account
-        BankAccount debtorAccount = Bank.simpleBankAccount()
-                .iban("FR7610011000201234567890188") // IBAN
-                .build();
-
-        // Transactions
-        Transaction transaction1 = Bank.simpleTransaction()
-                .account(Bank.simpleBankAccount()   // Creditor account
-                        .iban("FR7630001007941234567890185") // IBAN
-                        .build())
-                .amount("12.34")                                // Amount, converted to BigDecimal
-                .currency("EUR")                                // Currency code
-                .endToEndId("Transfer reference 1")             // End-to-end identifier
-                .build();
-
-        // Transfer
-        CreditTransferOperation creditTransfer = Bank.jaxbCreditTransferSepa(V09) // version 09
-                .debtorAccount(debtorAccount)                                // Mandatory debtor account
-                .transaction(transaction1)                                   // At least 1 transaction
-                .requestedExecutionDateTime(ZonedDateTime.now()              // Optional requested execution date and time,
-                        .plusDays(1)                                         // defaults to tomorrow
-                        .withSecond(0)
-                        .withNano(0))                                        
-                .build();
-
-        // export to string
-        String formattedOutput = creditTransfer.marshal(true); // true: enables formatting
-
-        // or export to file
-        creditTransfer.marshal(new FileWriter("myFile.xml")); // default: disables formatting
-    }
-}
-```
-
-Output with formatting:
-
-```xml
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.09">
-    <CstmrCdtTrfInitn>
-        <GrpHdr>
-            <MsgId>20251002092807</MsgId>
-            <CreDtTm>2025-10-02T09:28:07.3573245</CreDtTm>
-            <NbOfTxs>1</NbOfTxs>
-            <CtrlSum>12.34</CtrlSum>
-            <InitgPty/>
-        </GrpHdr>
-        <PmtInf>
-            <PmtInfId>20251002092807</PmtInfId>
-            <PmtMtd>TRF</PmtMtd>
-            <BtchBookg>false</BtchBookg>
-            <NbOfTxs>1</NbOfTxs>
-            <CtrlSum>12.34</CtrlSum>
-            <PmtTpInf>
-                <SvcLvl>
-                    <Cd>SEPA</Cd>
-                </SvcLvl>
-            </PmtTpInf>
-            <ReqdExctnDt>
-                <DtTm>2025-10-03T09:30:00+02:00</DtTm>
-            </ReqdExctnDt>
-            <Dbtr/>
-            <DbtrAcct>
-                <Id>
-                    <IBAN>FR7610011000201234567890188</IBAN>
-                </Id>
-            </DbtrAcct>
-            <DbtrAgt>
-                <FinInstnId/>
-            </DbtrAgt>
-            <ChrgBr>SLEV</ChrgBr>
-            <CdtTrfTxInf>
-                <PmtId>
-                    <EndToEndId>Transfer reference 1</EndToEndId>
-                </PmtId>
-                <Amt>
-                    <InstdAmt Ccy="EUR">12.34</InstdAmt>
-                </Amt>
-                <Cdtr/>
-                <CdtrAcct>
-                    <Id>
-                        <IBAN>FR7630001007941234567890185</IBAN>
-                    </Id>
-                </CdtrAcct>
-            </CdtTrfTxInf>
-        </PmtInf>
-    </CstmrCdtTrfInitn>
-</Document>
-```
-
 ## Go further
 
 ### Using the `Iso20022ReferenceElementValidator` class
@@ -420,4 +418,4 @@ Iso20022ReferenceElementValidator.isValidCharacterSet("ABCDEF1234"); // true
 
 ### Interfaces
 
-You can use your own implementations of `Transaction` and `BankAccount` but simple defaults are provided.
+You can use your own implementations of `Transaction`, `BankAccount`, `Party` and `PostalAddress` but simple defaults are provided.
