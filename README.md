@@ -2,7 +2,12 @@
 
 # bank4j
 
-Easily generate XML Credit Transfers based on [ISO 20022](https://www.iso20022.org/) Payments Initiation V03 (`pain.001.001.03`) or V09 (`pain.001.001.09`).
+Easily generate XML Credit Transfers based on [ISO 20022](https://www.iso20022.org/) Payments Initiation (`pain`):
+
+- `pain.001.001.03`
+- `pain.001.001.03.ch.02`
+- `pain.001.001.09`
+- `pain.001.003.03`
 
 Provides IBAN, BIC and Character set (for reference elements) validation with annotations.
 
@@ -21,7 +26,7 @@ Tested with [Qonto](https://qonto.com) bulk SEPA transfers.
 </dependency>
 ```
 
-* Use version 3 for `jarkarta.*` dependencies (Java 11, JAXB 3+, Bean Validation 3+)
+* Use version 3+ for `jarkarta.*` dependencies (Java 11, JAXB 3+, Bean Validation 3+)
 * Use version 2 for `javax.*` dependencies (Java 8, JAXB 2, Bean Validation 2)
 
 ## Usage
