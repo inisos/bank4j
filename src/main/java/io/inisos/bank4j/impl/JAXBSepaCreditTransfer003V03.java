@@ -30,7 +30,7 @@ import java.util.StringJoiner;
  */
 public class JAXBSepaCreditTransfer003V03 implements CreditTransferOperation {
 
-    private static final DateTimeFormatter FORMAT_AS_ID = DateTimeFormatter.ofPattern("yyyyMMddhhmmss");
+    private static final DateTimeFormatter FORMAT_AS_ID = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     private static final String DEFAULT_SERVICE_LEVEL = "SEPA";
     private static final String CURRENCY_EUR = "EUR";
 

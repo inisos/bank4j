@@ -26,7 +26,7 @@ import java.util.*;
  */
 public class JAXBCreditTransferV09 implements CreditTransferOperation {
 
-    private static final DateTimeFormatter FORMAT_AS_ID = DateTimeFormatter.ofPattern("yyyyMMddhhmmss");
+    private static final DateTimeFormatter FORMAT_AS_ID = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     private final Priority instructionPriority;
     private final String serviceLevelCode;
