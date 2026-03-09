@@ -73,7 +73,7 @@ public class JAXBCreditTransferV09 implements CreditTransferOperation {
         this.serviceLevelCode = serviceLevelCode;
         this.debtor = debtor;
         this.debtorAccount = Objects.requireNonNull(debtorAccount, "Debtor account cannot be null");
-        this.transactions = requireTransaction(Objects.requireNonNull(transactions));
+        this.transactions = requireSingleCurrency(requireTransaction(Objects.requireNonNull(transactions)));
         this.creationDateTime = Optional.ofNullable(creationDateTime).orElse(LocalDateTime.now());
         if(requestedExecutionDate != null && requestedExecutionDateTime != null) {
             throw new IllegalArgumentException("You cannot specify both requestedExecutionDate and requestedExecutionDateTime");
@@ -376,6 +376,17 @@ public class JAXBCreditTransferV09 implements CreditTransferOperation {
     private <T> Collection<T> requireTransaction(Collection<T> collection) {
         if (collection.isEmpty()) {
             throw new IllegalArgumentException("At least 1 transaction is required");
+        }
+        return collection;
+    }
+
+    private Collection<Transaction> requireSingleCurrency(Collection<Transaction> collection) {
+        long distinctCurrencies = collection.stream()
+                .map(Transaction::getCurrencyCode)
+                .distinct()
+                .count();
+        if (distinctCurrencies > 1) {
+            throw new IllegalArgumentException("All transactions must have the same currency");
         }
         return collection;
     }
