@@ -36,23 +36,23 @@ class TransactionValidatorTest {
     @Test
     public void isValid_pass_with_valid_remittance_information() {
         Transaction transaction = buildDefaultTransaction()
-            .remittanceInformationUnstructured(Collections.singleton("My unstructured remittance information"))
-            .build();
+                .remittanceInformationUnstructured(Collections.singleton("My unstructured remittance information"))
+                .build();
 
-            Set<ConstraintViolation<Transaction>> violations = validator.validate(transaction);
+        Set<ConstraintViolation<Transaction>> violations = validator.validate(transaction);
 
-            Assertions.assertTrue(violations.isEmpty(), "Expected no validation violations, but found: " + violations);
+        Assertions.assertTrue(violations.isEmpty(), "Expected no validation violations, but found: " + violations);
     }
 
     @Test
     public void isValid_fail_with_invalid_remittance_information() {
         Transaction transaction = buildDefaultTransaction()
-            .remittanceInformationUnstructured(Collections.singleton("kxwzbfbkuxjvpgwdrmbvjzgyjtgewfuopbseeuvzobmxhyiuzyxxksoqitapigozpeeoidjjxzfpixzybktauxsllyfcxiwucomrogwpewlevyflervetnxhjacuwnpbxlqlwcxdswsrf"))
-            .build();
+                .remittanceInformationUnstructured(Collections.singleton("kxwzbfbkuxjvpgwdrmbvjzgyjtgewfuopbseeuvzobmxhyiuzyxxksoqitapigozpeeoidjjxzfpixzybktauxsllyfcxiwucomrogwpewlevyflervetnxhjacuwnpbxlqlwcxdswsrf"))
+                .build();
 
-            Set<ConstraintViolation<Transaction>> violations = validator.validate(transaction);
+        Set<ConstraintViolation<Transaction>> violations = validator.validate(transaction);
 
-            Assertions.assertTrue(violations.size() > 0);
+        Assertions.assertFalse(violations.isEmpty());
     }
 
     @Test
@@ -63,6 +63,6 @@ class TransactionValidatorTest {
 
         Set<ConstraintViolation<Transaction>> violations = validator.validate(transaction);
 
-        Assertions.assertTrue(violations.size() > 0);
+        Assertions.assertFalse(violations.isEmpty());
     }
 }
