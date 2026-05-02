@@ -34,7 +34,19 @@ public interface CreditTransfer {
 
     boolean isBatchBooking();
 
+    /**
+     * @return the sum of all transaction amounts, regardless of currencies
+     * @deprecated use {@link #getControlSum()} instead
+     */
+    @Deprecated
     default BigDecimal getTotalAmount() {
+        return getControlSum();
+    }
+
+    /**
+     * @return the sum of all transaction amounts, regardless of currencies
+     */
+    default BigDecimal getControlSum() {
         return getTransactions()
                 .stream()
                 .map(Transaction::getAmount)

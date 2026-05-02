@@ -119,7 +119,7 @@ public class JAXBCreditTransferV03 implements CreditTransferOperation {
         paymentInstructionInformationSCT3.setPmtMtd(PaymentMethod3Code.TRF);
         paymentInstructionInformationSCT3.setBtchBookg(this.batchBooking);
         paymentInstructionInformationSCT3.setNbOfTxs(String.valueOf(this.transactions.size()));
-        paymentInstructionInformationSCT3.setCtrlSum(this.getTotalAmount());
+        paymentInstructionInformationSCT3.setCtrlSum(this.getControlSum());
         paymentInstructionInformationSCT3.setDbtr(partyIdentification(this.debtor));
         paymentInstructionInformationSCT3.setDbtrAcct(cashAccount(this.debtorAccount));
         paymentInstructionInformationSCT3.setDbtrAgt(mandatoryBranchAndFinancialInstitutionIdentification(this.debtorAccount));
@@ -153,7 +153,7 @@ public class JAXBCreditTransferV03 implements CreditTransferOperation {
         head.setMsgId(id);
         head.setCreDtTm(this.datatypeFactory.newXMLGregorianCalendar(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(creationDateTime)));
         head.setNbOfTxs(String.valueOf(this.transactions.size()));
-        head.setCtrlSum(this.getTotalAmount());
+        head.setCtrlSum(this.getControlSum());
         head.setInitgPty(partyIdentification(this.debtor));
         return head;
     }
