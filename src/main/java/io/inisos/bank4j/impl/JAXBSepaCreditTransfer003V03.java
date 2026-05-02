@@ -360,6 +360,7 @@ public class JAXBSepaCreditTransfer003V03 implements CreditTransferOperation {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (!(o instanceof JAXBSepaCreditTransfer003V03)) return false;
         JAXBSepaCreditTransfer003V03 that = (JAXBSepaCreditTransfer003V03) o;
         return batchBooking == that.batchBooking && instructionPriority == that.instructionPriority && Objects.equals(serviceLevelCode, that.serviceLevelCode) && Objects.equals(debtor, that.debtor) && Objects.equals(debtorAccount, that.debtorAccount) && Objects.equals(transactions, that.transactions) && Objects.equals(id, that.id) && Objects.equals(creationDateTime, that.creationDateTime) && Objects.equals(requestedExecutionDate, that.requestedExecutionDate) && chargeBearer == that.chargeBearer;
