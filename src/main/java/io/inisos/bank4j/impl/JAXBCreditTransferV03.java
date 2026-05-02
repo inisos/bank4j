@@ -180,7 +180,7 @@ public class JAXBCreditTransferV03 implements CreditTransferOperation {
         creditTransferTransactionInformation.setCdtrAcct(cashAccount(transaction.getAccount()));
 
         // remittance information
-        if (transaction.getRemittanceInformationUnstructured().size() > 0) {
+        if (!transaction.getRemittanceInformationUnstructured().isEmpty()) {
             RemittanceInformation5 remittanceInformation = new RemittanceInformation5();
             remittanceInformation.getUstrd().addAll(transaction.getRemittanceInformationUnstructured());
             creditTransferTransactionInformation.setRmtInf(remittanceInformation);
