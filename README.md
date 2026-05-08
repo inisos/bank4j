@@ -11,7 +11,7 @@ Easily generate XML Credit Transfers based on [ISO 20022](https://www.iso20022.o
 
 Provides IBAN, BIC and Character set (for reference elements) validation with annotations.
 
-Using JAXB and [iban4j](https://github.com/arturmkrtchyan/iban4j).
+Using JAXB and [iban-commons](https://github.com/SpeedBankingDe/iban-commons).
 
 ## Installation
 
