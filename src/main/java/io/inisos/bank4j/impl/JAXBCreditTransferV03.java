@@ -1,13 +1,13 @@
 package io.inisos.bank4j.impl;
 
+import de.speedbanking.bic.Bic;
+import de.speedbanking.iban.Iban;
 import io.inisos.bank4j.*;
 import iso._20022.pain_001_001_03.*;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
-import org.iban4j.BicUtil;
-import org.iban4j.IbanUtil;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -213,7 +213,7 @@ public class JAXBCreditTransferV03 implements CreditTransferOperation {
 
     private Optional<BranchAndFinancialInstitutionIdentification4> optionalBranchAndFinancialInstitutionIdentificationOpt(BankAccount bankAccount) {
         return bankAccount.getBic().map(bic -> {
-            BicUtil.validate(bic);
+            Bic.validate(bic); // throws InvalidBicException for invalid BIC
             FinancialInstitutionIdentification7 financialInstitutionIdentification = new FinancialInstitutionIdentification7();
             financialInstitutionIdentification.setBIC(bic);
             BranchAndFinancialInstitutionIdentification4 branchAndFinancialInstitutionIdentification = new BranchAndFinancialInstitutionIdentification4();
@@ -226,7 +226,7 @@ public class JAXBCreditTransferV03 implements CreditTransferOperation {
         BranchAndFinancialInstitutionIdentification4 branchAndFinancialInstitutionIdentification = new BranchAndFinancialInstitutionIdentification4();
         FinancialInstitutionIdentification7 financialInstitutionIdentification = new FinancialInstitutionIdentification7();
         bankAccount.getBic().ifPresent(bic -> {
-            BicUtil.validate(bic);
+            Bic.validate(bic);
             financialInstitutionIdentification.setBIC(bic);
         });
         branchAndFinancialInstitutionIdentification.setFinInstnId(financialInstitutionIdentification);
@@ -270,7 +270,7 @@ public class JAXBCreditTransferV03 implements CreditTransferOperation {
         Optional<String> optionalOtherId = bankAccount.getOtherId();
         if (optionalIban.isPresent()) {
             String iban = optionalIban.get();
-            IbanUtil.validate(iban);
+            Iban.validate(iban); // throws InvalidIbanException for invalid IBAN
             accountIdentification.setIBAN(iban);
         } else if (optionalOtherId.isPresent()) {
             GenericAccountIdentification1 genericAccountIdentification = new GenericAccountIdentification1();

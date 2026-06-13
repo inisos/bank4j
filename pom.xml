@@ -36,7 +36,7 @@
         <java.version>11</java.version>
 
         <!-- Dependency versions -->
-        <iban4j.version>3.2.13-RELEASE</iban4j.version>
+        <iban-commons.version>1.8.7</iban-commons.version>
         <jakarta-validation-api.version>3.1.1</jakarta-validation-api.version>
         <jakarta-xml-bind-api.version>4.0.5</jakarta-xml-bind-api.version>
         <jaxb-runtime.version>4.0.7</jaxb-runtime.version>
@@ -59,11 +59,11 @@
 
     <dependencies>
 
-        <!-- iban4j -->
+        <!-- iban-commons: Zero-dependency, high-performance Java 8+ library for IBAN and BIC validation -->
         <dependency>
-            <groupId>org.iban4j</groupId>
-            <artifactId>iban4j</artifactId>
-            <version>${iban4j.version}</version>
+            <groupId>de.speedbanking</groupId>
+            <artifactId>iban-commons</artifactId>
+            <version>${iban-commons.version}</version>
         </dependency>
 
         <!-- JAXB -->

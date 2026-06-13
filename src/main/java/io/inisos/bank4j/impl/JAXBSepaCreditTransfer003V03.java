@@ -1,13 +1,13 @@
 package io.inisos.bank4j.impl;
 
+import de.speedbanking.bic.Bic;
+import de.speedbanking.iban.Iban;
 import io.inisos.bank4j.*;
 import iso._20022.pain_001_003_03.*;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
-import org.iban4j.BicUtil;
-import org.iban4j.IbanUtil;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -209,7 +209,7 @@ public class JAXBSepaCreditTransfer003V03 implements CreditTransferOperation {
 
     private Optional<BranchAndFinancialInstitutionIdentificationSEPA1> optionalBranchAndFinancialInstitutionIdentificationOpt(BankAccount bankAccount) {
         return bankAccount.getBic().map(bic -> {
-            BicUtil.validate(bic);
+            Bic.validate(bic); // throws InvalidBicException for invalid BIC
             FinancialInstitutionIdentificationSEPA1 financialInstitutionIdentification = new FinancialInstitutionIdentificationSEPA1();
             financialInstitutionIdentification.setBIC(bic);
             BranchAndFinancialInstitutionIdentificationSEPA1 branchAndFinancialInstitutionIdentification = new BranchAndFinancialInstitutionIdentificationSEPA1();
@@ -221,10 +221,10 @@ public class JAXBSepaCreditTransfer003V03 implements CreditTransferOperation {
     private BranchAndFinancialInstitutionIdentificationSEPA3 mandatoryBranchAndFinancialInstitutionIdentification(BankAccount bankAccount) {
         BranchAndFinancialInstitutionIdentificationSEPA3 branchAndFinancialInstitutionIdentification = new BranchAndFinancialInstitutionIdentificationSEPA3();
         FinancialInstitutionIdentificationSEPA3 financialInstitutionIdentification = new FinancialInstitutionIdentificationSEPA3();
-        Optional<String> bic = bankAccount.getBic();
-        if (bic.isPresent()) {
-            BicUtil.validate(bic.get());
-            financialInstitutionIdentification.setBIC(bic.get());
+        if (bankAccount.getBic().isPresent()) {
+            String bic = bankAccount.getBic().get();
+            Bic.validate(bic);
+            financialInstitutionIdentification.setBIC(bic);
         } else {
             OthrIdentification othrIdentification = new OthrIdentification();
             othrIdentification.setId(OthrIdentificationCode.NOTPROVIDED);
@@ -282,7 +282,7 @@ public class JAXBSepaCreditTransfer003V03 implements CreditTransferOperation {
         Optional<String> optionalIban = bankAccount.getIban();
         if (optionalIban.isPresent()) {
             String iban = optionalIban.get();
-            IbanUtil.validate(iban);
+            Iban.validate(iban);
             accountIdentification.setIBAN(iban);
         } else {
             throw new IllegalArgumentException("IBAN must be provided for pain.001.003.03");
